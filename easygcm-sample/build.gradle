@@ -1,0 +1,42 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        mavenLocal()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:1.0.0'
+        classpath 'eu.inloop:easygcm-tasks:1.2.1'
+    }
+}
+
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 21
+    buildToolsVersion '21.1.1'
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+    defaultConfig {
+        minSdkVersion 21
+    }
+}
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+dependencies {
+    compile 'com.google.android.gms:play-services-base:6.5.87'
+    compile 'eu.inloop:easygcm:1.2.1@aar'
+}
+
+task push(type: eu.inloop.easygcm.PushTask) {
+    data = '{"key3":"value3"}'
+    apiKey = 'AIzaSyBdAVlm94Eponl90AYWEqHcBH4-BE1tzJU' // easygcm-client project
+    registrationIds = [
+            'APA91bFEZ3xs0lyYGWkPrG2UnKQ8h-8FcdGNDMhDhi1DVKew9s0LwXITGpo8zOiWaowXtWy2Io8iG8fLnsKlGYZln2SOoh8OugciaNaoRxB0zslfdMJ8Pt9MpDmBeLZJCeq7DQ5pLnQ83tortxi2l2awkkU5HUDOK-dJQet9BgQsPS7GK7PCv_I'
+    ]
+}

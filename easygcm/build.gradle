@@ -1,0 +1,34 @@
+apply plugin: 'com.android.library'
+apply plugin: 'maven'
+
+android {
+    compileSdkVersion Integer.parseInt(ANDROID_COMPILE_SDK_VERSION)
+    buildToolsVersion ANDROID_BUILD_TOOLS_VERSION
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+    defaultConfig {
+        minSdkVersion Integer.parseInt(ANDROID_COMPILE_SDK_VERSION)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'com.google.android.gms:play-services-base:6.5.87'
+}
+
+// upload to remote Maven repo
+//apply from: 'https://raw.github.com/inloop/gradle-mvn-push/master/gradle-mvn-push.gradle'
+
+// upload to local Maven repo
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: "file://${System.env.HOME}/.m2/repository")
+        }
+    }
+}
