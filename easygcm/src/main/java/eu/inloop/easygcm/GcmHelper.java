@@ -123,22 +123,24 @@ public final class GcmHelper {
      * shared preferences.
      */
     private void registerInBackground(final Context context) {
+        final Context appContext = context.getApplicationContext();
         new AsyncTask<Void, Void, String>() {
             @Override
             protected String doInBackground(Void... params) {
                 String msg = "";
                 try {
                     if (gcm == null) {
-                        gcm = GoogleCloudMessaging.getInstance(context);
+                        gcm = GoogleCloudMessaging.getInstance(appContext);
                     }
                     regid = gcm.register(mSenderId);
                     msg = "Device registered, registration ID=" + regid;
                     Log.d(TAG, "New registration ID=[" + regid + "]");
 
+
                     // You should send the registration ID to your server over HTTP, so it
                     // can use GCM/HTTP or CCS to send messages to your app.
-                    if (context.getApplicationContext() instanceof GcmListener) {
-                        ((GcmListener) context.getApplicationContext()).sendRegistrationIdToBackend(regid);
+                    if (appContext instanceof GcmListener) {
+                        ((GcmListener) appContext).sendRegistrationIdToBackend(regid);
                     } else {
                         Log.w(TAG, "Application should implement GcmHelper interface!");
                     }
@@ -148,7 +150,7 @@ public final class GcmHelper {
                     // 'from' address in the message.
 
                     // Persist the regID - no need to register again.
-                    storeRegistrationId(context, regid);
+                    storeRegistrationId(appContext, regid);
                 } catch (IOException ex) {
                     msg = "Error :" + ex.getMessage();
                     // If there is an error, don't just keep trying to register.
