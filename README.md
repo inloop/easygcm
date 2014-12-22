@@ -15,12 +15,12 @@ We are working on the first public release of the library. Before we go live in 
 
 Have a look at sample project in this repository. Integration of the library is very simple:
 
-* add Gradle dependency : `compile 'eu.inloop:easygcm:1.2.1@aar'`
+* add Gradle dependency : `compile 'eu.inloop:easygcm:1.2.2@aar'`
 * in your `Application` implement `GcmListener` interface with two methods: `onMessage()` and `sendRegistrationIdToBackend()`
 
 That's it. You might also want to use Gradle task for sending push notifications to your device:
 
-* add Gradle dependency to buildscript section: `classpath 'eu.inloop:easygcm-tasks:1.2.1'`
+* add Gradle dependency to buildscript section: `classpath 'eu.inloop:easygcm-tasks:1.2.2'`
 * edit push notification data, apiKey and registration ID in build.gradle
 * call `./gradlew push`
 

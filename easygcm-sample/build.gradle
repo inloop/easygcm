@@ -5,7 +5,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:1.0.0'
-        classpath 'eu.inloop:easygcm-tasks:1.2.1'
+        classpath 'eu.inloop:easygcm-tasks:1.2.2'
     }
 }
 
@@ -20,6 +20,7 @@ android {
     }
     defaultConfig {
         minSdkVersion 21
+        targetSdkVersion 21
     }
 }
 
@@ -30,7 +31,7 @@ repositories {
 
 dependencies {
     compile 'com.google.android.gms:play-services-base:6.5.87'
-    compile 'eu.inloop:easygcm:1.2.1@aar'
+    compile 'eu.inloop:easygcm:1.2.2@aar'
 }
 
 task push(type: eu.inloop.easygcm.PushTask) {
