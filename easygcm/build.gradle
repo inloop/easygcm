@@ -9,7 +9,7 @@ android {
         targetCompatibility JavaVersion.VERSION_1_7
     }
     defaultConfig {
-        minSdkVersion Integer.parseInt(ANDROID_COMPILE_SDK_VERSION)
+        minSdkVersion Integer.parseInt(ANDROID_MIN_SDK_VERSION)
         targetSdkVersion Integer.parseInt(ANDROID_TARGET_SDK_VERSION)
     }
 }
