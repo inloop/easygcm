@@ -10,6 +10,7 @@ android {
     }
     defaultConfig {
         minSdkVersion Integer.parseInt(ANDROID_COMPILE_SDK_VERSION)
+        targetSdkVersion Integer.parseInt(ANDROID_TARGET_SDK_VERSION)
     }
 }
 
