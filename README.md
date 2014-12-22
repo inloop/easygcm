@@ -10,7 +10,9 @@ It includes all the common code from the sample including AndroidManifest.xml th
 ### How to use:
 
 * add this to your build.bradle: `compile 'eu.inloop:easygcm:1.2.3@aar'`
-* in your `Application` implement `GcmListener` interface with two methods: `onMessage()` and `sendRegistrationIdToBackend()`
+* in your `Application` implement [GcmListener](http://github.com/inloop/easygcm/blob/master/easygcm/src/main/java/eu/inloop/easygcm/GcmListener.java) interface with two methods: 
+ * `onMessage()`
+ * `sendRegistrationIdToBackend()`
 
 That's it. You might also want to use Gradle task for sending push notifications to your device:
 
