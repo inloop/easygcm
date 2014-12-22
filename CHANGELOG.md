@@ -1,3 +1,9 @@
+## 1.2.3 (2014-12-22)
+
+Bugfixes:
+
+  - fixed min SDK - set to 9
+
 ## 1.2.2 (2014-12-22)
 
 Features:

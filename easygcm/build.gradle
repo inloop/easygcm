@@ -23,13 +23,13 @@ dependencies {
 }
 
 // upload to remote Maven repo
-//apply from: 'https://raw.github.com/inloop/gradle-mvn-push/master/gradle-mvn-push.gradle'
+apply from: 'https://raw.github.com/inloop/gradle-mvn-push/master/gradle-mvn-push.gradle'
 
 // upload to local Maven repo
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            repository(url: "file://${System.env.HOME}/.m2/repository")
-        }
-    }
-}
+// uploadArchives {
+//     repositories {
+//         mavenDeployer {
+//             repository(url: "file://${System.env.HOME}/.m2/repository")
+//         }
+//     }
+// }
