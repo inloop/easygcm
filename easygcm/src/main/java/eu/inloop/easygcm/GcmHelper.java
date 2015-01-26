@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -14,9 +13,10 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import java.io.IOException;
 
+import static eu.inloop.easygcm.GcmUtils.Logger;
+
 public final class GcmHelper {
 
-    private static final String TAG = "easygcm";
     private static final String PREFS_EASYGCM = "easygcm";
 
     public static final String EXTRA_MESSAGE = "message";
@@ -27,9 +27,16 @@ public final class GcmHelper {
     private final String mSenderId;
     private GoogleCloudMessaging gcm;
     private String regid;
+    private static volatile boolean sLoggingEnabled = true;
 
+    @SuppressWarnings("UnusedDeclaration")
     public static void init(Activity activity, String senderId) {
         new GcmHelper(senderId).onCreate(activity);
+    }
+
+    @SuppressWarnings("UnusedDeclaration")
+    public void setLoggingEnabled(boolean isEnabled) {
+        sLoggingEnabled = isEnabled;
     }
 
     private GcmHelper(String senderId) {
@@ -42,13 +49,15 @@ public final class GcmHelper {
             gcm = GoogleCloudMessaging.getInstance(activity);
             regid = getRegistrationId(activity);
 
-            Log.d(TAG, "Checking existing registration ID=[" + regid + "]");
+            if (sLoggingEnabled) {
+                Logger.d("Checking existing registration ID=[" + regid + "]");
+            }
 
             if (regid.isEmpty()) {
                 registerInBackground(activity);
             }
         } else {
-            Log.i(TAG, "No valid Google Play Services APK found.");
+            Logger.d("No valid Google Play Services APK found.");
         }
     }
 
@@ -64,7 +73,9 @@ public final class GcmHelper {
                 GooglePlayServicesUtil.getErrorDialog(resultCode, activity,
                         PLAY_SERVICES_RESOLUTION_REQUEST).show();
             } else {
-                Log.i(TAG, "This device is not supported.");
+                if (sLoggingEnabled) {
+                    Logger.d("This device is not supported.");
+                }
                 activity.finish();
             }
             return false;
@@ -82,7 +93,9 @@ public final class GcmHelper {
     private void storeRegistrationId(Context context, String regId) {
         final SharedPreferences prefs = getGcmPreferences(context);
         int appVersion = getAppVersion(context);
-        Log.i(TAG, "Saving regId on app version " + appVersion);
+        if (sLoggingEnabled) {
+            Logger.d("Saving regId on app version " + appVersion);
+        }
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString(PROPERTY_REG_ID, regId);
         editor.putInt(PROPERTY_APP_VERSION, appVersion);
@@ -101,7 +114,9 @@ public final class GcmHelper {
         final SharedPreferences prefs = getGcmPreferences(context);
         String registrationId = prefs.getString(PROPERTY_REG_ID, "");
         if (registrationId.isEmpty()) {
-            Log.i(TAG, "Registration not found.");
+            if (sLoggingEnabled) {
+                Logger.d("Registration not found.");
+            }
             return "";
         }
         // Check if app was updated; if so, it must clear the registration ID
@@ -110,7 +125,9 @@ public final class GcmHelper {
         int registeredVersion = prefs.getInt(PROPERTY_APP_VERSION, Integer.MIN_VALUE);
         int currentVersion = getAppVersion(context);
         if (registeredVersion != currentVersion) {
-            Log.i(TAG, "App version changed.");
+            if (sLoggingEnabled) {
+                Logger.d("App version changed.");
+            }
             return "";
         }
         return registrationId;
@@ -134,7 +151,9 @@ public final class GcmHelper {
                     }
                     regid = gcm.register(mSenderId);
                     msg = "Device registered, registration ID=" + regid;
-                    Log.d(TAG, "New registration ID=[" + regid + "]");
+                    if (sLoggingEnabled) {
+                        Logger.d("New registration ID=[" + regid + "]");
+                    }
 
 
                     // You should send the registration ID to your server over HTTP, so it
@@ -142,7 +161,7 @@ public final class GcmHelper {
                     if (appContext instanceof GcmListener) {
                         ((GcmListener) appContext).sendRegistrationIdToBackend(regid);
                     } else {
-                        Log.w(TAG, "Application should implement GcmHelper interface!");
+                        Logger.w("Application should implement GcmHelper interface!");
                     }
 
                     // For this demo: we don't need to send it because the device will send
@@ -162,7 +181,9 @@ public final class GcmHelper {
 
             @Override
             protected void onPostExecute(String msg) {
-                Log.d(TAG, "Post-registration message: " + msg);
+                if (sLoggingEnabled) {
+                    Logger.d("Post-registration message: " + msg);
+                }
             }
         }.execute(null, null, null);
     }
