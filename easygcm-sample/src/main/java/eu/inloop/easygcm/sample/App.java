@@ -22,5 +22,4 @@ public class App extends Application implements GcmListener {
     public void sendRegistrationIdToBackend(String registrationId) {
         
     }
-
 }

@@ -14,7 +14,8 @@ It includes all the common code from the sample including AndroidManifest.xml th
 * in your `Application` implement [GcmListener](http://github.com/inloop/easygcm/blob/master/easygcm/src/main/java/eu/inloop/easygcm/GcmListener.java) interface with two methods: 
  * `onMessage()` (don't forget to call wakeLockRelease.release() after you are done)
  * `sendRegistrationIdToBackend()`
-* in your MainActivity `onCreate()`, call `GcmHelper.init(this, "your-google-dev-project-id");`
+* in your MainActivity `onCreate()`, call `GcmHelper.init(this);`
+* define `easygcm_sender_id` string resource and set it to your GCM Sender ID
 
 That's it. You might also want to use Gradle task for sending push notifications to your device:
 

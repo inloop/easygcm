@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Override in your application to provide the GCM senderId -->
+    <!--suppress CheckTagEmptyBody -->
+    <string name="easygcm_sender_id" translatable="false"></string>
+</resources>

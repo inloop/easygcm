@@ -6,32 +6,48 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
+import android.text.TextUtils;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import easygcm.R;
 
 import static eu.inloop.easygcm.GcmUtils.Logger;
 
 public final class GcmHelper {
 
     private static final String PREFS_EASYGCM = "easygcm";
-
-    public static final String EXTRA_MESSAGE = "message";
-    public static final String PROPERTY_REG_ID = "registration_id";
+    private static final String PROPERTY_REG_ID = "registration_id";
     private static final String PROPERTY_APP_VERSION = "appVersion";
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
-    private final String mSenderId;
-    private GoogleCloudMessaging gcm;
-    private String regid;
-    private static volatile boolean sLoggingEnabled = true;
+    private static GcmHelper sInstance;
+    static volatile boolean sLoggingEnabled = true;
+    private final AtomicBoolean mRegistrationRunning = new AtomicBoolean(false);
 
     @SuppressWarnings("UnusedDeclaration")
-    public static void init(Activity activity, String senderId) {
-        new GcmHelper(senderId).onCreate(activity);
+    public static void init(Activity activity) {
+        if (!(activity.getApplicationContext() instanceof GcmListener)) {
+            throw new IllegalStateException("Application must implement GcmListener interface!");
+        }
+        getInstance().onCreate(activity);
+    }
+
+    synchronized static GcmHelper getInstance() {
+        if (sInstance == null) {
+            sInstance = new GcmHelper();
+        }
+
+        return sInstance;
+    }
+
+    private GcmHelper() {
+
     }
 
     @SuppressWarnings("UnusedDeclaration")
@@ -39,22 +55,17 @@ public final class GcmHelper {
         sLoggingEnabled = isEnabled;
     }
 
-    private GcmHelper(String senderId) {
-        mSenderId = senderId;
-    }
-
     private void onCreate(Activity activity) {
         // Check device for Play Services APK. If check succeeds, proceed with GCM registration.
         if (checkPlayServices(activity)) {
-            gcm = GoogleCloudMessaging.getInstance(activity);
-            regid = getRegistrationId(activity);
+            final String currentRegId = getRegistrationId(activity);
 
-            if (sLoggingEnabled) {
-                Logger.d("Checking existing registration ID=[" + regid + "]");
-            }
-
-            if (regid.isEmpty()) {
-                registerInBackground(activity);
+            if (currentRegId.isEmpty()) {
+                registerInBackground(activity, null);
+            } else {
+                if (sLoggingEnabled) {
+                    Logger.d("Checking existing registration ID=[" + currentRegId + "]");
+                }
             }
         } else {
             Logger.d("No valid Google Play Services APK found.");
@@ -67,7 +78,7 @@ public final class GcmHelper {
      * the Google Play Store or enable it in the device's system settings.
      */
     private boolean checkPlayServices(Activity activity) {
-        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(activity);
+        final int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(activity);
         if (resultCode != ConnectionResult.SUCCESS) {
             if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
                 GooglePlayServicesUtil.getErrorDialog(resultCode, activity,
@@ -91,15 +102,14 @@ public final class GcmHelper {
      * @param regId registration ID
      */
     private void storeRegistrationId(Context context, String regId) {
-        final SharedPreferences prefs = getGcmPreferences(context);
-        int appVersion = getAppVersion(context);
+        final int appVersion = GcmUtils.getAppVersion(context);
         if (sLoggingEnabled) {
             Logger.d("Saving regId on app version " + appVersion);
         }
-        SharedPreferences.Editor editor = prefs.edit();
+        final SharedPreferences.Editor editor = getGcmPreferences(context).edit();
         editor.putString(PROPERTY_REG_ID, regId);
         editor.putInt(PROPERTY_APP_VERSION, appVersion);
-        editor.commit();
+        editor.apply();
     }
 
     /**
@@ -112,7 +122,7 @@ public final class GcmHelper {
      */
     public static String getRegistrationId(Context context) {
         final SharedPreferences prefs = getGcmPreferences(context);
-        String registrationId = prefs.getString(PROPERTY_REG_ID, "");
+        final String registrationId = prefs.getString(PROPERTY_REG_ID, "");
         if (registrationId.isEmpty()) {
             if (sLoggingEnabled) {
                 Logger.d("Registration not found.");
@@ -122,8 +132,8 @@ public final class GcmHelper {
         // Check if app was updated; if so, it must clear the registration ID
         // since the existing regID is not guaranteed to work with the new
         // app version.
-        int registeredVersion = prefs.getInt(PROPERTY_APP_VERSION, Integer.MIN_VALUE);
-        int currentVersion = getAppVersion(context);
+        final int registeredVersion = prefs.getInt(PROPERTY_APP_VERSION, Integer.MIN_VALUE);
+        final int currentVersion = GcmUtils.getAppVersion(context);
         if (registeredVersion != currentVersion) {
             if (sLoggingEnabled) {
                 Logger.d("App version changed.");
@@ -139,42 +149,52 @@ public final class GcmHelper {
      * Stores the registration ID and the app versionCode in the application's
      * shared preferences.
      */
-    private void registerInBackground(final Context context) {
+    void registerInBackground(final Context context, final RegistrationListener registrationListener) {
         final Context appContext = context.getApplicationContext();
+        if (mRegistrationRunning.getAndSet(true)) {
+            if (sLoggingEnabled) {
+                Logger.d("Registration already running. Skipping");
+            }
+            return;
+        }
+
+        final String gcmSenderId = appContext.getResources().getString(R.string.easygcm_sender_id);
+        if (TextUtils.isEmpty(gcmSenderId)) {
+            throw new IllegalArgumentException("You have to override the easygcm_sender_id string resource to provide the GCM sender ID");
+        }
+
         new AsyncTask<Void, Void, String>() {
             @Override
             protected String doInBackground(Void... params) {
                 String msg = "";
                 try {
-                    if (gcm == null) {
-                        gcm = GoogleCloudMessaging.getInstance(appContext);
-                    }
-                    regid = gcm.register(mSenderId);
-                    msg = "Device registered, registration ID=" + regid;
+                    final GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(appContext);
+                    final String regId = gcm.register(gcmSenderId);
+                    msg = "Device registered, registration ID=" + regId;
                     if (sLoggingEnabled) {
-                        Logger.d("New registration ID=[" + regid + "]");
+                        Logger.d("New registration ID=[" + regId + "]");
                     }
-
 
                     // You should send the registration ID to your server over HTTP, so it
                     // can use GCM/HTTP or CCS to send messages to your app.
                     if (appContext instanceof GcmListener) {
-                        ((GcmListener) appContext).sendRegistrationIdToBackend(regid);
+                        ((GcmListener) appContext).sendRegistrationIdToBackend(regId);
                     } else {
                         Logger.w("Application should implement GcmHelper interface!");
                     }
 
-                    // For this demo: we don't need to send it because the device will send
-                    // upstream messages to a server that echo back the message using the
-                    // 'from' address in the message.
-
                     // Persist the regID - no need to register again.
-                    storeRegistrationId(appContext, regid);
+                    storeRegistrationId(appContext, regId);
                 } catch (IOException ex) {
                     msg = "Error :" + ex.getMessage();
                     // If there is an error, don't just keep trying to register.
                     // Require the user to click a button again, or perform
                     // exponential back-off.
+                } finally {
+                    mRegistrationRunning.set(false);
+                    if (registrationListener != null) {
+                        registrationListener.onFinish();
+                    }
                 }
                 return msg;
             }
@@ -188,18 +208,8 @@ public final class GcmHelper {
         }.execute(null, null, null);
     }
 
-    /**
-     * @return Application's version code from the {@code PackageManager}.
-     */
-    private static int getAppVersion(Context context) {
-        try {
-            PackageInfo packageInfo = context.getPackageManager()
-                    .getPackageInfo(context.getPackageName(), 0);
-            return packageInfo.versionCode;
-        } catch (PackageManager.NameNotFoundException e) {
-            // should never happen
-            throw new RuntimeException("Could not get package name: " + e);
-        }
+    interface RegistrationListener {
+        void onFinish();
     }
 
     /**
