@@ -5,6 +5,7 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 import android.app.IntentService;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.content.WakefulBroadcastReceiver;
 
 /**
  * This {@code IntentService} does the actual handling of the GCM message.
@@ -32,7 +33,7 @@ public class GcmIntentService extends IntentService {
             // Release the wake lock provided by the WakefulBroadcastReceiver.
         } else {
             // Release the wake lock provided by the WakefulBroadcastReceiver.
-            GcmBroadcastReceiver.completeWakefulIntent(intent);
+            WakefulBroadcastReceiver.completeWakefulIntent(intent);
             throw new IllegalStateException("Application must implement GcmListener interface!");
         }
 

@@ -45,6 +45,14 @@
             </intent-filter>
         </receiver>
 
+        <receiver android:name="eu.inloop.easygcm.GcmPackageReplacedReceiver">
+            <!-- Useful for detecting when the application is upgraded so we can request a new GCM ID -->
+            <!-- MY_PACKAGE_REPLACED only alerts for this same app, and it is only available on API 12 and up -->
+            <intent-filter>
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+
         <service android:name="eu.inloop.easygcm.GcmIntentService" />
         
         <meta-data

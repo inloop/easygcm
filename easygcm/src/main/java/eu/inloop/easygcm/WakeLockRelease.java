@@ -1,6 +1,7 @@
 package eu.inloop.easygcm;
 
 import android.content.Intent;
+import android.support.v4.content.WakefulBroadcastReceiver;
 
 public class WakeLockRelease {
 
@@ -14,6 +15,6 @@ public class WakeLockRelease {
      * Call this after you are done with processing of the broadcast.
      */
     public void release() {
-        GcmBroadcastReceiver.completeWakefulIntent(mWakefulIntent);
+        WakefulBroadcastReceiver.completeWakefulIntent(mWakefulIntent);
     }
 }
