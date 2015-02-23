@@ -1,6 +1,5 @@
 # easygcm
 
-
 Android Library for easy GCM integration. Including push notifications sender task for Gradle.
 
 This library is based on sample client code provided by Android documentation at http://developer.android.com/google/gcm/client.html and https://code.google.com/p/gcm/
@@ -8,6 +7,8 @@ This library is based on sample client code provided by Android documentation at
 It includes all the common code from the sample including AndroidManifest.xml that is automatically merged into your application. Also content of sample's DemoActivity is included in this library extracted in GcmHelper class.
 
 ### How to use:
+
+**WARNING** Current version on Maven Central contains bug and will not work properly. We are [working on fix](https://github.com/inloop/easygcm/issues/12).
 
 * add this to your build.gradle: `compile 'eu.inloop:easygcm:1.2.3@aar'`
 * in your `Application` implement [GcmListener](http://github.com/inloop/easygcm/blob/master/easygcm/src/main/java/eu/inloop/easygcm/GcmListener.java) interface with two methods: 
