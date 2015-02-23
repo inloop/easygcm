@@ -5,7 +5,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:1.1.0'
-        classpath 'eu.inloop:easygcm-tasks:1.2.3'
+        classpath 'eu.inloop:easygcm-tasks:1.3.0-SNAPSHOT'
     }
 }
 
@@ -19,7 +19,7 @@ android {
         targetCompatibility JavaVersion.VERSION_1_7
     }
     defaultConfig {
-        minSdkVersion 21
+        minSdkVersion 14
         targetSdkVersion 21
 
         // unfortunately, this is needed with latest tools, because of this bug:
@@ -35,7 +35,7 @@ repositories {
 
 dependencies {
     compile 'com.google.android.gms:play-services-base:6.5.87'
-    compile 'eu.inloop:easygcm:1.2.3@aar'
+    compile 'eu.inloop:easygcm:1.3.0-SNAPSHOT@aar'
 }
 
 task push(type: eu.inloop.easygcm.PushTask) {
