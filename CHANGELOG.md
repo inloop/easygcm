@@ -14,6 +14,10 @@ Bugfixes:
   - [#14 GET_ACCOUNTS permission is not needed on ICS+](https://github.com/inloop/easygcm/issues/14)
   - [#15 Re-register immediately after app update](https://github.com/inloop/easygcm/issues/15)
 
+Features:
+
+  - add option to disable logging, see `GcmHelper.setLoggingEnabled()`
+
 ## 1.2.3 (2014-12-22)
 
 Bugfixes:
