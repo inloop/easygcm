@@ -8,7 +8,7 @@ It includes all the common code from the sample including AndroidManifest.xml th
 
 ### How to use:
 
-**WARNING** Current stable versions (1.2.x) on Maven Central contain bug and will not work properly. We have a fix, please use version 1.3.0-SNAPSHOT meanwhile.
+**WARNING** Current stable versions (1.2.x) on Maven Central contain bug and will not work properly. We have a fix, meanwhile please use version 1.3.0-SNAPSHOT from Sonatype snapshots repository.
 
 * add this to your build.gradle: `compile 'eu.inloop:easygcm:1.3.0-SNAPSHOT@aar'`
 * in your `Application` implement [GcmListener](http://github.com/inloop/easygcm/blob/master/easygcm/src/main/java/eu/inloop/easygcm/GcmListener.java) interface with two methods: 
