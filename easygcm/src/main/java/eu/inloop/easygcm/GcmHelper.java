@@ -155,6 +155,10 @@ public final class GcmHelper {
             if (sLoggingEnabled) {
                 Logger.d("Registration already running. Skipping");
             }
+            //call to release wakelock
+            if (registrationListener != null) {
+                registrationListener.onFinish();
+            }
             return;
         }
 
