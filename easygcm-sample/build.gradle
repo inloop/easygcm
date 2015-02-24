@@ -2,6 +2,9 @@ buildscript {
     repositories {
         mavenLocal()
         mavenCentral()
+        maven {
+            url "https://oss.sonatype.org/content/repositories/snapshots"
+        }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:1.1.0'
@@ -24,7 +27,8 @@ android {
 
         // unfortunately, this is needed with latest tools, because of this bug:
         // https://code.google.com/p/android/issues/detail?id=143836
-        manifestPlaceholders = [ localApplicationId:"eu.inloop.easygcm.sample" ]
+        applicationId "eu.inloop.easygcm.sample"
+        manifestPlaceholders = [ localApplicationId:applicationId ]
 
         versionCode 9
     }
@@ -33,6 +37,9 @@ android {
 repositories {
     mavenLocal()
     mavenCentral()
+    maven {
+        url "https://oss.sonatype.org/content/repositories/snapshots"
+    }
 }
 
 dependencies {
