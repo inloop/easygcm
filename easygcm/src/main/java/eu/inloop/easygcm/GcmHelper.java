@@ -3,9 +3,8 @@ package eu.inloop.easygcm;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.text.TextUtils;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -29,6 +28,8 @@ public final class GcmHelper {
     private static GcmHelper sInstance;
     static volatile boolean sLoggingEnabled = true;
     private final AtomicBoolean mRegistrationRunning = new AtomicBoolean(false);
+    private static final int DEFAULT_BACKOFF_MS = 2000;
+    private static final int MAX_RETRIES = 5;
 
     @SuppressWarnings("UnusedDeclaration")
     public static void init(Activity activity) {
@@ -42,7 +43,6 @@ public final class GcmHelper {
         if (sInstance == null) {
             sInstance = new GcmHelper();
         }
-
         return sInstance;
     }
 
@@ -167,14 +167,37 @@ public final class GcmHelper {
             throw new IllegalArgumentException("You have to override the easygcm_sender_id string resource to provide the GCM sender ID");
         }
 
-        new AsyncTask<Void, Void, String>() {
+        final AsyncTask<Void, Void, Void> registrationTask = new AsyncTask<Void, Void, Void>() {
             @Override
-            protected String doInBackground(Void... params) {
-                String msg = "";
-                try {
-                    final GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(appContext);
-                    final String regId = gcm.register(gcmSenderId);
-                    msg = "Device registered, registration ID=" + regId;
+            protected Void doInBackground(Void... params) {
+                final GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(appContext);
+                String regId = null;
+                long currentBackoff = DEFAULT_BACKOFF_MS;
+
+                for (int i = 0; i < MAX_RETRIES; i++) {
+                    try {
+                        regId = gcm.register(gcmSenderId);
+                        break;
+                    }  catch (IOException ex) {
+                        if (sLoggingEnabled) {
+                            Logger.w("Failed to register. Error :" + ex.getMessage());
+                        }
+                        // If there is an error, don't just keep trying to register.
+                        // Require the user to click a button again, or perform
+                        // exponential back-off.
+
+                        if (i < MAX_RETRIES - 1) {
+                            try {
+                                Thread.sleep(currentBackoff);
+                            } catch (InterruptedException e) {
+                                //
+                            }
+                            currentBackoff *= 2;
+                        }
+                    }
+                }
+
+                if (regId != null) {
                     if (sLoggingEnabled) {
                         Logger.d("New registration ID=[" + regId + "]");
                     }
@@ -189,27 +212,28 @@ public final class GcmHelper {
 
                     // Persist the regID - no need to register again.
                     storeRegistrationId(appContext, regId);
-                } catch (IOException ex) {
-                    msg = "Error :" + ex.getMessage();
-                    // If there is an error, don't just keep trying to register.
-                    // Require the user to click a button again, or perform
-                    // exponential back-off.
-                } finally {
-                    mRegistrationRunning.set(false);
-                    if (registrationListener != null) {
-                        registrationListener.onFinish();
+
+                } else {
+                    if (sLoggingEnabled) {
+                        Logger.w("Definitely failed to register after " + MAX_RETRIES + " retries");
                     }
                 }
-                return msg;
-            }
 
-            @Override
-            protected void onPostExecute(String msg) {
-                if (sLoggingEnabled) {
-                    Logger.d("Post-registration message: " + msg);
+                mRegistrationRunning.set(false);
+                if (registrationListener != null) {
+                    registrationListener.onFinish();
                 }
+
+                return null;
             }
-        }.execute(null, null, null);
+        };
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            registrationTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, null, null, null);
+        } else {
+            registrationTask.execute(null, null, null);
+        }
+
     }
 
     interface RegistrationListener {
