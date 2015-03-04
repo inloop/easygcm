@@ -26,6 +26,7 @@ public final class GcmHelper {
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
     private static GcmHelper sInstance;
+    private GcmListener mGcmListener;
     static volatile boolean sLoggingEnabled = true;
     private final AtomicBoolean mRegistrationRunning = new AtomicBoolean(false);
     private static final int DEFAULT_BACKOFF_MS = 2000;
@@ -33,9 +34,6 @@ public final class GcmHelper {
 
     @SuppressWarnings("UnusedDeclaration")
     public static void init(Activity activity) {
-        if (!(activity.getApplicationContext() instanceof GcmListener)) {
-            throw new IllegalStateException("Application must implement GcmListener interface!");
-        }
         getInstance().onCreate(activity);
     }
 
@@ -53,6 +51,18 @@ public final class GcmHelper {
     @SuppressWarnings("UnusedDeclaration")
     public void setLoggingEnabled(boolean isEnabled) {
         sLoggingEnabled = isEnabled;
+    }
+
+    /**
+     * Allows to specify custom {@link eu.inloop.easygcm.GcmListener} if you don't want to implement it in the {@link
+     * android.app.Application} instance.
+     *
+     * This method should be called in {@link android.app.Application#onCreate()}.
+     *
+     * @param gcmListener custom GCM listener
+     */
+    public static void setGcmListener(GcmListener gcmListener) {
+        getInstance().mGcmListener = gcmListener;
     }
 
     private void onCreate(Activity activity) {
@@ -204,11 +214,7 @@ public final class GcmHelper {
 
                     // You should send the registration ID to your server over HTTP, so it
                     // can use GCM/HTTP or CCS to send messages to your app.
-                    if (appContext instanceof GcmListener) {
-                        ((GcmListener) appContext).sendRegistrationIdToBackend(regId);
-                    } else {
-                        Logger.w("Application should implement GcmHelper interface!");
-                    }
+                    getGcmListener(appContext).sendRegistrationIdToBackend(regId);
 
                     // Persist the regID - no need to register again.
                     storeRegistrationId(appContext, regId);
@@ -247,6 +253,17 @@ public final class GcmHelper {
         // This sample app persists the registration ID in shared preferences, but
         // how you store the regID in your app is up to you.
         return context.getSharedPreferences(PREFS_EASYGCM, Context.MODE_PRIVATE);
+    }
+
+    GcmListener getGcmListener(Context context) {
+        if (mGcmListener != null) {
+            return mGcmListener;
+        }
+        if (context.getApplicationContext() instanceof GcmListener) {
+            return (GcmListener)context.getApplicationContext();
+        }
+        throw new IllegalStateException("Please implement GcmListener in your Application or use method " +
+            "setGcmListener()");
     }
 
 }

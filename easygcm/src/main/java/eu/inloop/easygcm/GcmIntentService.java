@@ -28,14 +28,7 @@ public class GcmIntentService extends IntentService {
         // in your BroadcastReceiver.
         String messageType = gcm.getMessageType(intent);
 
-        if (getApplication() instanceof GcmListener) {
-            ((GcmListener) getApplication()).onMessage(messageType, extras, new WakeLockRelease(intent));
-            // Release the wake lock provided by the WakefulBroadcastReceiver.
-        } else {
-            // Release the wake lock provided by the WakefulBroadcastReceiver.
-            WakefulBroadcastReceiver.completeWakefulIntent(intent);
-            throw new IllegalStateException("Application must implement GcmListener interface!");
-        }
+        GcmHelper.getInstance().getGcmListener(getApplication()).onMessage(messageType, extras, new WakeLockRelease(intent));
 
     }
 
