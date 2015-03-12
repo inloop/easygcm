@@ -16,7 +16,7 @@ It includes all the common code from the sample including AndroidManifest.xml th
  * `sendRegistrationIdToBackend()`
 * in your MainActivity `onCreate()`, call `GcmHelper.init(this);`
 * define `easygcm_sender_id` string resource and set it to your GCM Sender ID
-* add manifest placeholder with your package name in your build config (see sample project): `manifestPlaceholders = [ localApplicationId:"your.package.here" ]` - this is temporary workaround for [this Android bug](https://code.google.com/p/android/issues/detail?id=143836)
+* add manifest placeholder with your package name in your build config (see sample project): `manifestPlaceholders = [ localApplicationId:"your.package.here" ]` - this is temporary workaround for [this Android bug](https://code.google.com/p/android/issues/detail?id=156015)
 
 If you need ```GET_ACCOUNTS``` permission, add this to you application's manifest:
 
