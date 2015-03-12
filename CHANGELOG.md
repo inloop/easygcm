@@ -1,4 +1,4 @@
-## 1.3.0
+## 1.3.0 (2015-03-12)
 
 This release brings incompatible changes. Please README and sample project for details on integration of the library in your project. Shortly:
 
@@ -16,6 +16,8 @@ Bugfixes:
 
 Features:
 
+  - [Support for setting custom GcmListener](https://github.com/inloop/easygcm/pull/21)
+  - [Retry if GCM registration fails](https://github.com/inloop/easygcm/pull/20)
   - add option to disable logging, see `GcmHelper.setLoggingEnabled()`
 
 ## 1.2.3 (2014-12-22)
