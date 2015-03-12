@@ -1,4 +1,4 @@
-## 1.3.0-SNAPSHOT
+## 1.3.0
 
 This release brings incompatible changes. Please README and sample project for details on integration of the library in your project. Shortly:
 
