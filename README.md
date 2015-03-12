@@ -18,6 +18,12 @@ It includes all the common code from the sample including AndroidManifest.xml th
 * define `easygcm_sender_id` string resource and set it to your GCM Sender ID
 * add manifest placeholder with your package name in your build config (see sample project): `manifestPlaceholders = [ localApplicationId:"your.package.here" ]` - this is temporary workaround for [this Android bug](https://code.google.com/p/android/issues/detail?id=143836)
 
+If you need ```GET_ACCOUNTS``` permission, add this to you application's manifest:
+
+    <uses-permission
+        android:name="android.permission.GET_ACCOUNTS"
+        tools:remove="android:maxSdkVersion"/>
+
 That's it. You might also want to use Gradle task for sending push notifications to your device:
 
 * add Gradle dependency to buildscript section: `classpath 'eu.inloop:easygcm-tasks:1.3.0-SNAPSHOT'`
