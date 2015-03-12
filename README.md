@@ -4,13 +4,11 @@ Android Library for easy GCM integration. Including push notifications sender ta
 
 This library is based on sample client code provided by Android documentation at http://developer.android.com/google/gcm/client.html and https://code.google.com/p/gcm/
 
-It includes all the common code from the sample including AndroidManifest.xml that is automatically merged into your application. Also content of sample's DemoActivity is included in this library extracted in GcmHelper class.
+It includes all the common code from the sample including AndroidManifest.xml that is automatically merged into your application. Also content of sample's DemoActivity is included in this library extracted in GcmHelper class. This library further improves original sample client in several ways, see [changelog](https://github.com/inloop/easygcm/blob/master/CHANGELOG.md).
 
 ### How to use:
 
-**WARNING** Current stable versions (1.2.x) on Maven Central contain bug and will not work properly. We have a fix, meanwhile please use version 1.3.0-SNAPSHOT from Sonatype snapshots repository.
-
-* add this to your build.gradle: `compile 'eu.inloop:easygcm:1.3.0-SNAPSHOT@aar'`
+* add this to your build.gradle: `compile 'eu.inloop:easygcm:1.3.0@aar'`
 * in your `Application` implement [GcmListener](http://github.com/inloop/easygcm/blob/master/easygcm/src/main/java/eu/inloop/easygcm/GcmListener.java) interface with two methods: 
  * `onMessage()` (don't forget to call wakeLockRelease.release() after you are done)
  * `sendRegistrationIdToBackend()`
@@ -26,7 +24,7 @@ If you need ```GET_ACCOUNTS``` permission, add this to you application's manifes
 
 That's it. You might also want to use Gradle task for sending push notifications to your device:
 
-* add Gradle dependency to buildscript section: `classpath 'eu.inloop:easygcm-tasks:1.3.0-SNAPSHOT'`
+* add Gradle dependency to buildscript section: `classpath 'eu.inloop:easygcm-tasks:1.3.0'`
 * edit push notification data, apiKey and registration ID in build.gradle
 * call `./gradlew push`
 
