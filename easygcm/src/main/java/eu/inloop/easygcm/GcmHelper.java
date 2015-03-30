@@ -23,10 +23,10 @@ public final class GcmHelper {
     private static final String PREFS_EASYGCM = "easygcm";
     private static final String PROPERTY_REG_ID = "registration_id";
     private static final String PROPERTY_APP_VERSION = "appVersion";
-    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
     private static GcmHelper sInstance;
     private GcmListener mGcmListener;
+    private GcmServicesHandler mCheckServicesHandler;
     static volatile boolean sLoggingEnabled = true;
     private final AtomicBoolean mRegistrationRunning = new AtomicBoolean(false);
     private static final int DEFAULT_BACKOFF_MS = 2000;
@@ -45,7 +45,7 @@ public final class GcmHelper {
     }
 
     private GcmHelper() {
-
+        mCheckServicesHandler = new GcmServicesHandler();
     }
 
     @SuppressWarnings("UnusedDeclaration")
@@ -65,40 +65,45 @@ public final class GcmHelper {
         getInstance().mGcmListener = gcmListener;
     }
 
-    private void onCreate(Activity activity) {
+    /**
+     * Allows to specify a custom {@link eu.inloop.easygcm.GcmServicesHandler} which handles a situation
+     * when Google Play services are not available. Typically this should display a warning dialog.
+     * The default handler shows
+     * {@link com.google.android.gms.common.GooglePlayServicesUtil#getErrorDialog(int, android.app.Activity, int)}
+     *
+     * @param handler your custom handler for checking GcmServices.
+     */
+    public static void setCheckServicesHandler(GcmServicesHandler handler) {
+        if (handler == null) {
+            throw new IllegalArgumentException("GcmServicesHandler can't be null");
+        }
+        getInstance().mCheckServicesHandler = handler;
+    }
+
+    private void onCreate(Activity context) {
         // Check device for Play Services APK. If check succeeds, proceed with GCM registration.
-        if (checkPlayServices(activity)) {
-            final String currentRegId = getRegistrationId(activity);
+        if (checkPlayServices(context)) {
+            final String currentRegId = getRegistrationId(context);
 
             if (currentRegId.isEmpty()) {
-                registerInBackground(activity, null);
+                registerInBackground(context, null);
             } else {
                 if (sLoggingEnabled) {
                     Logger.d("Checking existing registration ID=[" + currentRegId + "]");
                 }
             }
         } else {
-            Logger.d("No valid Google Play Services APK found.");
+            if (sLoggingEnabled) {
+                Logger.d("No valid Google Play Services found.");
+            }
         }
     }
 
-    /**
-     * Check the device to make sure it has the Google Play Services APK. If
-     * it doesn't, display a dialog that allows users to download the APK from
-     * the Google Play Store or enable it in the device's system settings.
-     */
     private boolean checkPlayServices(Activity activity) {
         final int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(activity);
         if (resultCode != ConnectionResult.SUCCESS) {
-            if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
-                GooglePlayServicesUtil.getErrorDialog(resultCode, activity,
-                        PLAY_SERVICES_RESOLUTION_REQUEST).show();
-            } else {
-                if (sLoggingEnabled) {
-                    Logger.d("This device is not supported.");
-                }
-                activity.finish();
-            }
+            mCheckServicesHandler.onPlayServicesUnavailable(activity, resultCode,
+                    GooglePlayServicesUtil.isUserRecoverableError(resultCode));
             return false;
         }
         return true;

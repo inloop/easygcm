@@ -17,6 +17,10 @@ class GcmUtils {
         static void w(String message) {
             Log.w(TAG, message);
         }
+
+        static void e(String message) {
+            Log.e(TAG, message);
+        }
     }
 
     /**
