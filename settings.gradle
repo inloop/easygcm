@@ -1,4 +1,3 @@
 include 'easygcm'
 include 'easygcm-tasks'
-
-// include 'easygcm-sample'
+include 'easygcm-sample'
