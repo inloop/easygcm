@@ -3,12 +3,13 @@ apply plugin: 'maven'
 
 repositories {
     mavenCentral()
+    jcenter()
 }
 
 dependencies {
     compile gradleApi()
     compile localGroovy()
-    compile 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
+    compile 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.2'
 }
 
 sourceCompatibility = JavaVersion.VERSION_1_7
