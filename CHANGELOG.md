@@ -1,3 +1,14 @@
+## 1.4.0 (2015-05-14)
+
+Features:
+
+  - [#26  Allow custom Play Services handling and re-registration](https://github.com/inloop/easygcm/pull/26)
+  - Update Google Play Services to 7.3
+  
+Bugfixes:
+
+  - [#30 Fix build scripts to use local project instead of build from repository](https://github.com/inloop/easygcm/pull/30)
+  
 ## 1.3.0 (2015-03-12)
 
 This release brings incompatible changes. Please README and sample project for details on integration of the library in your project. Shortly:
