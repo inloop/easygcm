@@ -8,7 +8,7 @@ It includes all the common code from the sample including AndroidManifest.xml th
 
 ### How to use:
 
-* add this to your build.gradle: `compile 'eu.inloop:easygcm:1.3.0@aar'`
+* add this to your build.gradle: `compile 'eu.inloop:easygcm:1.4.0@aar'`
 * in your `Application` implement [GcmListener](http://github.com/inloop/easygcm/blob/master/easygcm/src/main/java/eu/inloop/easygcm/GcmListener.java) interface with two methods: 
  * `onMessage()` (don't forget to call wakeLockRelease.release() after you are done)
  * `sendRegistrationIdToBackend()`
