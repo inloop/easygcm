@@ -1,0 +1,1 @@
+This is confirmation that we (inloop) are owners of the library and want to move distribution to JCenter.
