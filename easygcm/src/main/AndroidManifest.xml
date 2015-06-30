@@ -18,9 +18,9 @@
      NOTE: the permission *must* be called PACKAGE.permission.C2D_MESSAGE,
            where PACKAGE is the application's package name.
     -->
-    <permission android:name="${localApplicationId}.permission.C2D_MESSAGE"
+    <permission android:name="${applicationId}.permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
-    <uses-permission android:name="${localApplicationId}.permission.C2D_MESSAGE" />
+    <uses-permission android:name="${applicationId}.permission.C2D_MESSAGE" />
 
     <!-- This app has permission to register and receive data message. -->
     <uses-permission
@@ -41,7 +41,7 @@
             <intent-filter>
                 <!-- Receives the actual messages. -->
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
-                <category android:name="${localApplicationId}" />
+                <category android:name="${applicationId}" />
             </intent-filter>
         </receiver>
 
