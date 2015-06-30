@@ -5,15 +5,11 @@ import android.os.Bundle;
 import com.google.android.gms.gcm.GcmListenerService;
 
 /**
- * This {@code IntentService} does the actual handling of the GCM message.
- * {@code GcmBroadcastReceiver} (a {@code WakefulBroadcastReceiver}) holds a
- * partial wake lock for this service while the service does its work. When the
- * service is finished, it calls {@code completeWakefulIntent()} to release the
- * wake lock.
+ * This {@code GcmListenerService} does the actual handling of the GCM message.
  */
-public class GcmIntentService extends GcmListenerService {
+public class EasyGcmListenerService extends GcmListenerService {
 
-    private static final String TAG = "MyGcmListenerService";
+    private static final String TAG = "EasyGcmListenerService";
 
     /**
      * Called when message is received.

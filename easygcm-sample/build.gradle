@@ -14,6 +14,7 @@ buildscript {
 }
 
 apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services'
 
 android {
     compileSdkVersion 22
@@ -48,6 +49,6 @@ task push(type: eu.inloop.easygcm.PushTask) {
     data = '{"myMessage":"Hello World"}'
     apiKey = 'AIzaSyB7ech9F12igTfHmm9X5GtsA66UBAdt-XE' // easygcm-client project
     registrationIds = [
-            'APA91bG8fk0cd9bAJoV-hvYLUx6WXbfm6nHZYvWmwZcZdKH0cCbrYOT1yUJfOaoNFdQ6UvaIbmeCsdByj59mGIwaXfHZIDCcwYVr0CkJS9pLwnrTNRi_5vyPJvd5JA2-cQhpzkmBzp5q'
+            'cHL7f5zj7Qk:APA91bFi9ThwBZZYmMa-vFtbXk-pXT6ZjzUeYW0x2jidmaxii2oXQ7LjsACi-205FqV0h4TnNlRTZXlafp_McPD7DSKbSBMV4a5qgBapNowxVnL0OuajOd19qBYbvxy3mdSa0SmF8Ne7'
     ]
 }

@@ -6,8 +6,9 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <!-- GCM requires a Google account on pre-ICS devices. -->
-    <uses-permission android:name="android.permission.GET_ACCOUNTS"
-		android:maxSdkVersion="13"/>
+    <uses-permission
+        android:name="android.permission.GET_ACCOUNTS"
+        android:maxSdkVersion="13" />
 
     <!-- Keeps the processor from sleeping when a message is received. -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -18,16 +19,16 @@
      NOTE: the permission *must* be called PACKAGE.permission.C2D_MESSAGE,
            where PACKAGE is the application's package name.
     -->
-    <permission android:name="${applicationId}.permission.C2D_MESSAGE"
+    <permission
+        android:name="${applicationId}.permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
     <uses-permission android:name="${applicationId}.permission.C2D_MESSAGE" />
 
     <!-- This app has permission to register and receive data message. -->
-    <uses-permission
-        android:name="com.google.android.c2dm.permission.RECEIVE" />
-    
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+
     <application>
-        
+
         <!--
           The com.google.android.c2dm.permission.SEND permission is necessary
           so only GCM services can send data messages for the app.
@@ -35,10 +36,12 @@
         <receiver
             android:name="com.google.android.gms.gcm.GcmReceiver"
             android:exported="true"
-            android:permission="com.google.android.c2dm.permission.SEND" >
+            android:permission="com.google.android.c2dm.permission.SEND">
             <intent-filter>
                 <!-- Receives the actual messages. -->
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
+
                 <category android:name="${applicationId}" />
             </intent-filter>
         </receiver>
@@ -51,16 +54,29 @@
             </intent-filter>
         </receiver>
 
-        <service android:name="eu.inloop.easygcm.GcmIntentService">
+        <!-- Services that handles incoming message -->
+        <service
+            android:name="eu.inloop.easygcm.EasyGcmListenerService"
+            android:exported="false">
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
             </intent-filter>
         </service>
-        
+
+        <!-- Called if InstanceID token is updated -->
+        <!-- This may occur if the security of the previous token had been compromised -->
+        <service
+            android:name="eu.inloop.easygcm.EasyInstanceIDListenerService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.android.gms.iid.InstanceID" />
+            </intent-filter>
+        </service>
+
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
-            
+
     </application>
 
 </manifest>
