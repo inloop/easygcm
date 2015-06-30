@@ -16,7 +16,7 @@ buildscript {
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 21
+    compileSdkVersion 22
     buildToolsVersion '22.0.1'
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_7
@@ -45,9 +45,9 @@ dependencies {
 }
 
 task push(type: eu.inloop.easygcm.PushTask) {
-    data = '{"key3":"value3"}'
-    apiKey = 'AIzaSyBdAVlm94Eponl90AYWEqHcBH4-BE1tzJU' // easygcm-client project
+    data = '{"myMessage":"Hello World"}'
+    apiKey = 'AIzaSyB7ech9F12igTfHmm9X5GtsA66UBAdt-XE' // easygcm-client project
     registrationIds = [
-            'APA91bFEZ3xs0lyYGWkPrG2UnKQ8h-8FcdGNDMhDhi1DVKew9s0LwXITGpo8zOiWaowXtWy2Io8iG8fLnsKlGYZln2SOoh8OugciaNaoRxB0zslfdMJ8Pt9MpDmBeLZJCeq7DQ5pLnQ83tortxi2l2awkkU5HUDOK-dJQet9BgQsPS7GK7PCv_I'
+            'APA91bG8fk0cd9bAJoV-hvYLUx6WXbfm6nHZYvWmwZcZdKH0cCbrYOT1yUJfOaoNFdQ6UvaIbmeCsdByj59mGIwaXfHZIDCcwYVr0CkJS9pLwnrTNRi_5vyPJvd5JA2-cQhpzkmBzp5q'
     ]
 }

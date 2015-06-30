@@ -1,11 +1,8 @@
 package eu.inloop.easygcm;
 
-import com.google.android.gms.gcm.GoogleCloudMessaging;
-
-import android.app.IntentService;
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.content.WakefulBroadcastReceiver;
+
+import com.google.android.gms.gcm.GcmListenerService;
 
 /**
  * This {@code IntentService} does the actual handling of the GCM message.
@@ -14,22 +11,27 @@ import android.support.v4.content.WakefulBroadcastReceiver;
  * service is finished, it calls {@code completeWakefulIntent()} to release the
  * wake lock.
  */
-public class GcmIntentService extends IntentService {
+public class GcmIntentService extends GcmListenerService {
 
-    public GcmIntentService() {
-        super("GcmIntentService");
-    }
+    private static final String TAG = "MyGcmListenerService";
 
+    /**
+     * Called when message is received.
+     *
+     * @param from SenderID of the sender.
+     * @param data Data bundle containing message data as key/value pairs.
+     *             For Set of keys use data.keySet().
+     */
+    // [START receive_message]
     @Override
-    protected void onHandleIntent(Intent intent) {
-        Bundle extras = intent.getExtras();
-        GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(this);
-        // The getMessageType() intent parameter must be the intent you received
-        // in your BroadcastReceiver.
-        String messageType = gcm.getMessageType(intent);
+    public void onMessageReceived(String from, Bundle data) {
 
-        GcmHelper.getInstance().getGcmListener(getApplication()).onMessage(messageType, extras, new WakeLockRelease(intent));
+        if (GcmHelper.sLoggingEnabled) {
+            GcmUtils.Logger.d("Received message from: " + from);
+        }
+
+        GcmHelper.getInstance().getGcmListener(getApplication()).onMessage(from, data);
 
     }
-
+    // [END receive_message]
 }

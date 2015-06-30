@@ -29,14 +29,12 @@
     <application>
         
         <!--
-          WakefulBroadcastReceiver that will receive intents from GCM
-          services and hand them to the custom IntentService.
-
           The com.google.android.c2dm.permission.SEND permission is necessary
           so only GCM services can send data messages for the app.
         -->
         <receiver
-            android:name="eu.inloop.easygcm.GcmBroadcastReceiver"
+            android:name="com.google.android.gms.gcm.GcmReceiver"
+            android:exported="true"
             android:permission="com.google.android.c2dm.permission.SEND" >
             <intent-filter>
                 <!-- Receives the actual messages. -->
@@ -53,7 +51,11 @@
             </intent-filter>
         </receiver>
 
-        <service android:name="eu.inloop.easygcm.GcmIntentService" />
+        <service android:name="eu.inloop.easygcm.GcmIntentService">
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+            </intent-filter>
+        </service>
         
         <meta-data
             android:name="com.google.android.gms.version"

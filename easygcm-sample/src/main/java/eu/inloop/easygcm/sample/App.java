@@ -4,22 +4,20 @@ import android.app.Application;
 import android.os.Bundle;
 
 import eu.inloop.easygcm.GcmListener;
-import eu.inloop.easygcm.WakeLockRelease;
 
 public class App extends Application implements GcmListener {
 
     @Override
-    public void onMessage(String s, Bundle bundle, WakeLockRelease wakeLockRelease) {
-        System.out.println("### message: " + s);
+    public void onMessage(String from, Bundle data) {
+        System.out.println("### message from: " + from);
         System.out.println("### bundle:");
-        for (String key: bundle.keySet()) {
-            System.out.println("> " + key + ": " + bundle.get(key));
+        for (String key : data.keySet()) {
+            System.out.println("> " + key + ": " + data.get(key));
         }
-        wakeLockRelease.release();
     }
 
     @Override
     public void sendRegistrationIdToBackend(String registrationId) {
-        
+
     }
 }
