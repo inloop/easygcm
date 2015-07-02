@@ -14,10 +14,11 @@ buildscript {
 }
 
 apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services'
 
 android {
-    compileSdkVersion 21
-    buildToolsVersion '21.1.2'
+    compileSdkVersion 22
+    buildToolsVersion '22.0.1'
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_7
         targetCompatibility JavaVersion.VERSION_1_7
@@ -25,12 +26,6 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 21
-
-        // unfortunately, this is needed with latest tools, because of this bug:
-        // https://code.google.com/p/android/issues/detail?id=143836
-        applicationId "eu.inloop.easygcm.sample"
-        manifestPlaceholders = [ localApplicationId:applicationId ]
-
         versionCode 9
     }
 }
@@ -51,9 +46,9 @@ dependencies {
 }
 
 task push(type: eu.inloop.easygcm.PushTask) {
-    data = '{"key3":"value3"}'
-    apiKey = 'AIzaSyBdAVlm94Eponl90AYWEqHcBH4-BE1tzJU' // easygcm-client project
+    data = '{"myMessage":"Hello World"}'
+    apiKey = 'AIzaSyB7ech9F12igTfHmm9X5GtsA66UBAdt-XE' // easygcm-client project
     registrationIds = [
-            'APA91bFEZ3xs0lyYGWkPrG2UnKQ8h-8FcdGNDMhDhi1DVKew9s0LwXITGpo8zOiWaowXtWy2Io8iG8fLnsKlGYZln2SOoh8OugciaNaoRxB0zslfdMJ8Pt9MpDmBeLZJCeq7DQ5pLnQ83tortxi2l2awkkU5HUDOK-dJQet9BgQsPS7GK7PCv_I'
+            'cHL7f5zj7Qk:APA91bFi9ThwBZZYmMa-vFtbXk-pXT6ZjzUeYW0x2jidmaxii2oXQ7LjsACi-205FqV0h4TnNlRTZXlafp_McPD7DSKbSBMV4a5qgBapNowxVnL0OuajOd19qBYbvxy3mdSa0SmF8Ne7'
     ]
 }
