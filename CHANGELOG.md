@@ -1,3 +1,20 @@
+## 1.5.0 (2015-07-02)
+
+This release brings incompatible changes. Please README and sample project for details on integration of the library in your project. Shortly:
+
+ - onMessage is changed, no need to release a wake lock. Make sure, your blocking tasks are executed directly in GcmListener callback methods, as they run in background thread. Creating s new background task would not be guaranteed to run.
+ - no need to add custom manifest placeholder `localApplicationId`
+
+Features:
+
+  - [#33 Support for Google Play Services 7.5](https://github.com/inloop/easygcm/issues/33)
+  - [#34 Switch lib to use ${applicationId} in manifest once Android bug is fixed](https://github.com/inloop/easygcm/issues/34)
+
+Bugfixes:
+
+  - [#32 BroadcastReceiver trying to return result during a non-ordered broadcast](https://github.com/inloop/easygcm/issues/32)
+  - [#36 BroadcastReceiver trying to return result during a non-ordered broadcast](https://github.com/inloop/easygcm/issues/36)
+
 ## 1.4.0 (2015-05-14)
 
 Features:
