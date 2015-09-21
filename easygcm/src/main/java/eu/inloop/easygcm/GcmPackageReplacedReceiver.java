@@ -6,7 +6,7 @@ import android.support.v4.content.WakefulBroadcastReceiver;
 import android.text.TextUtils;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.GoogleApiAvailability;
 
 public class GcmPackageReplacedReceiver extends WakefulBroadcastReceiver {
     @Override
@@ -24,7 +24,7 @@ public class GcmPackageReplacedReceiver extends WakefulBroadcastReceiver {
                 return;
             }
 
-            final int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(context);
+            final int resultCode = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(context);
             if (resultCode != ConnectionResult.SUCCESS) {
                 GcmUtils.Logger.e("Package replaced but Play Services are not available, skipping. " + resultCode);
                 return;

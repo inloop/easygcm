@@ -1,7 +1,8 @@
 package eu.inloop.easygcm;
 
 import android.app.Activity;
-import com.google.android.gms.common.GooglePlayServicesUtil;
+
+import com.google.android.gms.common.GoogleApiAvailability;
 
 public class GcmServicesHandler {
 
@@ -13,7 +14,7 @@ public class GcmServicesHandler {
      * the Google Play Store or enable it in the device's system settings.
      */
     protected void onPlayServicesUnavailable(Activity context, int errorCode, boolean recoverable) {
-        GooglePlayServicesUtil.getErrorDialog(errorCode, context, PLAY_SERVICES_RESOLUTION_REQUEST).show();
+        GoogleApiAvailability.getInstance().getErrorDialog(context, errorCode, PLAY_SERVICES_RESOLUTION_REQUEST).show();
         if (GcmHelper.sLoggingEnabled) {
             GcmUtils.Logger.d("This device is not supported. Error code " + errorCode + " Recoverable - " + recoverable);
         }

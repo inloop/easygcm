@@ -8,7 +8,7 @@ import android.os.Build;
 import android.text.TextUtils;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
 
@@ -70,7 +70,7 @@ public final class GcmHelper {
      * Allows to specify a custom {@link eu.inloop.easygcm.GcmServicesHandler} which handles a situation
      * when Google Play services are not available. Typically this should display a warning dialog.
      * The default handler shows
-     * {@link com.google.android.gms.common.GooglePlayServicesUtil#getErrorDialog(int, android.app.Activity, int)}
+     * {@link com.google.android.gms.common.GoogleApiAvailability#getErrorDialog(android.app.Activity, int, int)}
      *
      * @param handler your custom handler for checking GcmServices.
      */
@@ -101,10 +101,10 @@ public final class GcmHelper {
     }
 
     private boolean checkPlayServices(Activity activity) {
-        final int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(activity);
+        final int resultCode = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(activity);
         if (resultCode != ConnectionResult.SUCCESS) {
             mCheckServicesHandler.onPlayServicesUnavailable(activity, resultCode,
-                    GooglePlayServicesUtil.isUserRecoverableError(resultCode));
+                    GoogleApiAvailability.getInstance().isUserResolvableError(resultCode));
             return false;
         }
         return true;

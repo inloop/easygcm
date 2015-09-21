@@ -17,7 +17,7 @@
 package eu.inloop.easygcm;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.iid.InstanceIDListenerService;
 
 public class EasyInstanceIDListenerService extends InstanceIDListenerService {
@@ -35,7 +35,7 @@ public class EasyInstanceIDListenerService extends InstanceIDListenerService {
             GcmUtils.Logger.d("Received token refresh broadcast");
         }
 
-        final int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+        final int resultCode = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this);
         if (resultCode != ConnectionResult.SUCCESS) {
             GcmUtils.Logger.e("Token replaced but Play Services are not available, skipping. " + resultCode);
             return;
