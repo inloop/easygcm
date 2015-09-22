@@ -5,6 +5,9 @@
     <!-- GCM connects to Google Services. -->
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!-- delays gcm registration if device is offline -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+
     <!-- Keeps the processor from sleeping when a message is received. -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
@@ -49,6 +52,12 @@
             </intent-filter>
         </receiver>
 
+        <receiver android:name="eu.inloop.easygcm.NetworkStateReceiver">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+            </intent-filter>
+        </receiver>
+
         <!-- Services that handles incoming message -->
         <service
             android:name="eu.inloop.easygcm.EasyGcmListenerService"
@@ -66,6 +75,11 @@
             <intent-filter>
                 <action android:name="com.google.android.gms.iid.InstanceID" />
             </intent-filter>
+        </service>
+
+        <service
+            android:name="eu.inloop.easygcm.GcmRegistrationService"
+            android:exported="false">
         </service>
 
         <meta-data

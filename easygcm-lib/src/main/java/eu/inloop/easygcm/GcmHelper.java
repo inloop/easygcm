@@ -1,19 +1,10 @@
 package eu.inloop.easygcm;
 
 import android.app.Activity;
+import android.app.IntentService;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
-import android.os.Build;
 import android.text.TextUtils;
-
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.gcm.GoogleCloudMessaging;
-import com.google.android.gms.iid.InstanceID;
-
-import java.io.IOException;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import easygcm.R;
 
@@ -29,9 +20,6 @@ public final class GcmHelper {
     private GcmListener mGcmListener;
     private GcmServicesHandler mCheckServicesHandler;
     static volatile boolean sLoggingEnabled = true;
-    private final AtomicBoolean mRegistrationRunning = new AtomicBoolean(false);
-    private static final int DEFAULT_BACKOFF_MS = 2000;
-    private static final int MAX_RETRIES = 5;
 
     @SuppressWarnings("UnusedDeclaration")
     public static void init(Activity activity) {
@@ -47,11 +35,6 @@ public final class GcmHelper {
 
     private GcmHelper() {
         mCheckServicesHandler = new GcmServicesHandler();
-    }
-
-    @SuppressWarnings("UnusedDeclaration")
-    public void setLoggingEnabled(boolean isEnabled) {
-        sLoggingEnabled = isEnabled;
     }
 
     /**
@@ -81,33 +64,13 @@ public final class GcmHelper {
         getInstance().mCheckServicesHandler = handler;
     }
 
-    private void onCreate(Activity context) {
-        // Check device for Play Services APK. If check succeeds, proceed with GCM registration.
-        if (checkPlayServices(context)) {
-            final String currentRegId = getRegistrationId(context);
-
-            if (currentRegId.isEmpty()) {
-                registerInBackground(context, null);
-            } else {
-                if (sLoggingEnabled) {
-                    Logger.d("Checking existing registration ID=[" + currentRegId + "]");
-                }
-            }
-        } else {
-            if (sLoggingEnabled) {
-                Logger.d("No valid Google Play Services found.");
-            }
-        }
-    }
-
-    private boolean checkPlayServices(Activity activity) {
-        final int resultCode = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(activity);
-        if (resultCode != ConnectionResult.SUCCESS) {
-            mCheckServicesHandler.onPlayServicesUnavailable(activity, resultCode,
-                    GoogleApiAvailability.getInstance().isUserResolvableError(resultCode));
-            return false;
-        }
-        return true;
+    /**
+     * Checks, whether a registration Id for an app exists. If not, the app needs to register
+     * @param context application's context.
+     * @return true if a registration Id is persisted in shared preferences, false otherwise.
+     */
+    public static boolean isRegistered(Context context) {
+        return !TextUtils.isEmpty(getRegistrationId(context));
     }
 
     /**
@@ -117,7 +80,7 @@ public final class GcmHelper {
      * @param context application's context.
      * @param regId   registration ID
      */
-    private void storeRegistrationId(Context context, String regId) {
+    private static void storeRegistrationId(Context context, String regId) {
         final int appVersion = GcmUtils.getAppVersion(context);
         if (sLoggingEnabled) {
             Logger.d("Saving regId on app version " + appVersion);
@@ -128,6 +91,7 @@ public final class GcmHelper {
         editor.apply();
     }
 
+
     /**
      * Gets the current registration ID for application on GCM service, if there is one.
      * <p/>
@@ -136,7 +100,7 @@ public final class GcmHelper {
      * @return registration ID, or empty string if there is no existing
      * registration ID.
      */
-    public static String getRegistrationId(Context context) {
+    private static String getRegistrationId(Context context) {
         final SharedPreferences prefs = getGcmPreferences(context);
         final String registrationId = prefs.getString(PROPERTY_REG_ID, "");
         if (registrationId.isEmpty()) {
@@ -160,6 +124,32 @@ public final class GcmHelper {
     }
 
     /**
+     * @return Application's {@code SharedPreferences}.
+     */
+    private static SharedPreferences getGcmPreferences(Context context) {
+        // The registrationId is stored in SharedPreferences by the library.
+        return context.getSharedPreferences(PREFS_EASYGCM, Context.MODE_PRIVATE);
+    }
+
+    @SuppressWarnings("UnusedDeclaration")
+    public void setLoggingEnabled(boolean isEnabled) {
+        sLoggingEnabled = isEnabled;
+    }
+
+    /**
+     * Registers the application defined by a context activity to GCM in case the registration
+     * has not been done already.
+     * @param context Activity belonging to the app being registered
+     */
+    private void onCreate(Activity context) {
+        // The check method fails if: device is offline / app already registered / GooglePlayServices unavailable
+        if (GcmUtils.checkCanAndShouldRegister(context)) {
+            // Start a background service to register in a background thread
+            context.startService(GcmRegistrationService.createGcmRegistrationIntent(context));
+        }
+    }
+
+    /**
      * Get GCM sender id from available configuration.
      * <p/>
      * Returns gcm_defaultSenderId if it's provided by the google services gradle plugin via
@@ -169,7 +159,8 @@ public final class GcmHelper {
      * @param context Application context
      * @return GCM sender id
      */
-    private static String getGcmSenderId(Context context) {
+
+    public static String getGcmSenderId(Context context) {
         final Context appContext = context.getApplicationContext();
 
         // Try to use gcm_defaultSenderId generated by google services gradle task
@@ -180,128 +171,29 @@ public final class GcmHelper {
 
         // Try to use easygcm_sender_id value for backward compatibility
         gcmSenderId = appContext.getResources().getString(R.string.easygcm_sender_id);
-        return gcmSenderId;
-    }
 
-    /**
-     * Registers the application with GCM servers asynchronously.
-     * <p/>
-     * Stores the registration ID and the app versionCode in the application's
-     * shared preferences.
-     */
-    void registerInBackground(final Context context, final RegistrationListener registrationListener) {
-        final Context appContext = context.getApplicationContext();
-        if (mRegistrationRunning.getAndSet(true)) {
-            if (sLoggingEnabled) {
-                Logger.d("Registration already running. Skipping");
-            }
-            //call to release wakelock
-            if (registrationListener != null) {
-                registrationListener.onFinish();
-            }
-            return;
+        if (!TextUtils.isEmpty(gcmSenderId)) {
+            return gcmSenderId;
         }
 
-        final String gcmSenderId = getGcmSenderId(context);
-        if (TextUtils.isEmpty(gcmSenderId)) {
-            throw new IllegalArgumentException("You have to override the easygcm_sender_id string "
-                    + "resource to provide the GCM sender ID, OR provide it using google services "
-                    + "gradle plugin and google-services.json configuration.");
-        }
-
-        final AsyncTask<Void, Void, Void> registrationTask = new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                String regId = null;
-
-                long currentBackoff = DEFAULT_BACKOFF_MS;
-
-                for (int i = 0; i < MAX_RETRIES; i++) {
-                    try {
-                        InstanceID instanceID = InstanceID.getInstance(context);
-                        regId = instanceID.getToken(gcmSenderId,
-                                GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
-                        break;
-                    } catch (IOException ex) {
-                        if (sLoggingEnabled) {
-                            Logger.w("Failed to register. Error :" + ex.getMessage());
-                        }
-                        // If there is an error, don't just keep trying to register.
-                        // Require the user to click a button again, or perform
-                        // exponential back-off.
-
-                        if (i < MAX_RETRIES - 1) {
-                            try {
-                                Thread.sleep(currentBackoff);
-                            } catch (InterruptedException e) {
-                                //
-                            }
-                            currentBackoff *= 2;
-                        }
-                    } catch (SecurityException ex) {
-                        if (sLoggingEnabled) {
-                            Logger.w("Failed to register. Error :" + ex.getMessage());
-                        }
-                        // On some devices like (GT-P5210, NokiaX2DS , GT-I9082L, W100, ILIUM
-                        // S220) and/with custom ROM's library crashes with following error:
-                        // java.lang.SecurityException: Not allowed to start service Intent
-                        // { act=com.google.android.c2dm.intent.REGISTER pkg=com.google.android.gms (has extras) }
-                        // without permission com.google.android.c2dm.permission.RECEIVE ...
-                        // We think, it is probably due to missing Google Play Services, but we do not have
-                        // proper feedback on this.
-                        // Since there is no known solution at the moment for this, we will just catch it.
-                    }
-                }
-
-                if (regId != null) {
-                    if (sLoggingEnabled) {
-                        Logger.d("New registration ID=[" + regId + "]");
-                    }
-
-                    // You should send the registration ID to your server over HTTP, so it
-                    // can use GCM/HTTP or CCS to send messages to your app.
-                    getGcmListener(appContext).sendRegistrationIdToBackend(regId);
-
-                    // Persist the regID - no need to register again.
-                    storeRegistrationId(appContext, regId);
-
-                } else {
-                    if (sLoggingEnabled) {
-                        Logger.w("Definitely failed to register after " + MAX_RETRIES + " retries");
-                    }
-                }
-
-                mRegistrationRunning.set(false);
-                if (registrationListener != null) {
-                    registrationListener.onFinish();
-                }
-
-                return null;
-            }
-        };
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            registrationTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, null, null, null);
-        } else {
-            registrationTask.execute(null, null, null);
-        }
-
+        throw new IllegalArgumentException("You have to override the easygcm_sender_id string "
+                + "resource to provide the GCM sender ID, OR provide it using google services "
+                + "gradle plugin and google-services.json configuration.");
     }
 
-    interface RegistrationListener {
-        void onFinish();
+    // Called from an IntentService background thread
+    void onSuccessfulRegistration(Context context, String regId) {
+
+        // You should send the registration ID to your server over HTTP, so it
+        // can use GCM/HTTP or CCS to send messages to your app.
+        getGcmListener(context).sendRegistrationIdToBackend(regId);
+
+        // Persist the regID - no need to register again.
+        // Also serves for detection of previous registrations
+        storeRegistrationId(context, regId);
     }
 
-    /**
-     * @return Application's {@code SharedPreferences}.
-     */
-    private static SharedPreferences getGcmPreferences(Context context) {
-        // This sample app persists the registration ID in shared preferences, but
-        // how you store the regID in your app is up to you.
-        return context.getSharedPreferences(PREFS_EASYGCM, Context.MODE_PRIVATE);
-    }
-
-    GcmListener getGcmListener(Context context) {
+    public GcmListener getGcmListener(Context context) {
         if (mGcmListener != null) {
             return mGcmListener;
         }

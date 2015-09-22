@@ -5,6 +5,9 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.util.Log;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+
 class GcmUtils {
 
     static final String TAG = "easygcm";
@@ -35,5 +38,29 @@ class GcmUtils {
             // should never happen
             throw new RuntimeException("Could not get package name: " + e);
         }
+    }
+
+    static boolean checkCanAndShouldRegister(Context context) {
+        if (!ConnectionUtils.isOnline(context)) {
+            if (GcmHelper.sLoggingEnabled) {
+                GcmUtils.Logger.d("Cannot register. Device is not online.");
+            }
+            return false;
+        }
+
+        if (GcmHelper.isRegistered(context)) {
+            if (GcmHelper.sLoggingEnabled) {
+                GcmUtils.Logger.d("Registration was already done.");
+            }
+            return false;
+        }
+
+        final int resultCode = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(context);
+        if (resultCode != ConnectionResult.SUCCESS) {
+            GcmUtils.Logger.e("Play Services are not available: " + resultCode);
+            return false;
+        }
+
+        return true;
     }
 }

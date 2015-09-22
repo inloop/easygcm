@@ -41,6 +41,6 @@ public class EasyInstanceIDListenerService extends InstanceIDListenerService {
             return;
         }
 
-        GcmHelper.getInstance().registerInBackground(this, null);
+        startService(GcmRegistrationService.createGcmRegistrationIntent(this));
     }
 }
