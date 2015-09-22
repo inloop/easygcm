@@ -1,9 +1,20 @@
+## 1.5.1 (2015-09-22)
+
+Features:
+
+  - [#47 Updated to Google Play Services 7.8.0] (https://github.com/inloop/easygcm/issues/47)
+  - [#48 Used GoogleApiAvailibility instead of GooglePlayServicesUtil] (https://github.com/inloop/easygcm/issues/48)
+
+Bugfixes:
+
+  - [#43 Removed GET_ACCOUNTS permission] (https://github.com/inloop/easygcm/issues/43)
+
 ## 1.5.0 (2015-07-02)
 
 This release brings incompatible changes. Please README and sample project for details on integration of the library in your project. Shortly:
 
- - `onMessage` is changed, no need to release a wake lock. Make sure, your blocking tasks are executed directly in `GcmListener` callback methods, as they run in background thread. Creating a new background task would not be guaranteed to run.
- - no need to add custom manifest placeholder `localApplicationId`
+  - `onMessage` is changed, no need to release a wake lock. Make sure, your blocking tasks are executed directly in `GcmListener` callback methods, as they run in background thread. Creating a new background task would not be guaranteed to run.
+  - no need to add custom manifest placeholder `localApplicationId`
 
 Features:
 
