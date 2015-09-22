@@ -5,11 +5,6 @@
     <!-- GCM connects to Google Services. -->
     <uses-permission android:name="android.permission.INTERNET" />
 
-    <!-- GCM requires a Google account on pre-ICS devices. -->
-    <uses-permission
-        android:name="android.permission.GET_ACCOUNTS"
-        android:maxSdkVersion="13" />
-
     <!-- Keeps the processor from sleeping when a message is received. -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
