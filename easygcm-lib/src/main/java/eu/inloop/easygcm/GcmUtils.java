@@ -50,7 +50,7 @@ class GcmUtils {
 
         if (GcmHelper.isRegistered(context)) {
             if (GcmHelper.sLoggingEnabled) {
-                GcmUtils.Logger.d("Registration was already done.");
+                GcmUtils.Logger.d("Registration was already done: " + GcmHelper.getRegistrationId(context));
             }
             return false;
         }
