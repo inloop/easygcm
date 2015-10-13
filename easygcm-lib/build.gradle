@@ -26,6 +26,7 @@ dependencies {
 uploadArchives {
     repositories {
         mavenDeployer {
+            pom.artifactId = POM_ARTIFACT_ID
             repository(url: "file://${System.env.HOME}/.m2/repository")
         }
     }
