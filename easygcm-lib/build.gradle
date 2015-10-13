@@ -14,10 +14,6 @@ android {
     }
 }
 
-repositories {
-    mavenCentral()
-}
-
 dependencies {
     compile 'com.google.android.gms:play-services-base:8.1.0'
     compile 'com.google.android.gms:play-services-gcm:8.1.0'
