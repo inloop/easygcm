@@ -1,3 +1,9 @@
+## 1.5.3 (2015-10-13)
+
+Bugfixes:
+
+  - [#45 The package name of permission.C2D_MESSAGE still wrong] (https://github.com/inloop/easygcm/issues/45)
+
 ## 1.5.2 (2015-09-28)
 
 Features:
