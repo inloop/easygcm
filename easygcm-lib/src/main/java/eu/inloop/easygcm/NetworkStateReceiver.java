@@ -10,7 +10,7 @@ import android.support.v4.content.WakefulBroadcastReceiver;
 public class NetworkStateReceiver extends WakefulBroadcastReceiver {
     @Override
     public void onReceive(Context context, final Intent intent) {
-        if (GcmHelper.sLoggingEnabled) {
+        if (EasyGcm.sLoggingEnabled) {
             GcmUtils.Logger.d("Connection state changed event received...");
         }
 

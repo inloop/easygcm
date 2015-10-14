@@ -42,15 +42,15 @@ class GcmUtils {
 
     static boolean checkCanAndShouldRegister(Context context) {
         if (!ConnectionUtils.isOnline(context)) {
-            if (GcmHelper.sLoggingEnabled) {
+            if (EasyGcm.sLoggingEnabled) {
                 GcmUtils.Logger.d("Cannot register. Device is not online.");
             }
             return false;
         }
 
-        if (GcmHelper.isRegistered(context)) {
-            if (GcmHelper.sLoggingEnabled) {
-                GcmUtils.Logger.d("Registration was already done: " + GcmHelper.getRegistrationId(context));
+        if (EasyGcm.isRegistered(context)) {
+            if (EasyGcm.sLoggingEnabled) {
+                GcmUtils.Logger.d("Registration was already done: " + EasyGcm.getRegistrationId(context));
             }
             return false;
         }

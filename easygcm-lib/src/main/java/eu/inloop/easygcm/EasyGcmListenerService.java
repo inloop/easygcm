@@ -22,11 +22,11 @@ public class EasyGcmListenerService extends GcmListenerService {
     @Override
     public void onMessageReceived(String from, Bundle data) {
 
-        if (GcmHelper.sLoggingEnabled) {
+        if (EasyGcm.sLoggingEnabled) {
             GcmUtils.Logger.d("Received message from: " + from);
         }
 
-        GcmHelper.getInstance().getGcmListener(getApplication()).onMessage(from, data);
+        EasyGcm.getInstance().getGcmListener(getApplication()).onMessage(from, data);
 
     }
     // [END receive_message]

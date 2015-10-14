@@ -29,11 +29,11 @@ public class EasyInstanceIDListenerService extends InstanceIDListenerService {
      */
     @Override
     public void onTokenRefresh() {
-        if (GcmHelper.sLoggingEnabled) {
+        if (EasyGcm.sLoggingEnabled) {
             GcmUtils.Logger.d("Received token refresh broadcast");
         }
 
-        GcmHelper.removeRegistrationId(getApplicationContext());
+        EasyGcm.removeRegistrationId(getApplicationContext());
 
         if (GcmUtils.checkCanAndShouldRegister(getApplicationContext())) {
             startService(GcmRegistrationService.createGcmRegistrationIntent(this));

@@ -8,7 +8,7 @@ public class GcmPackageReplacedReceiver extends WakefulBroadcastReceiver {
     @Override
     public void onReceive(Context context, final Intent intent) {
         if (intent != null && intent.getAction().equals(Intent.ACTION_MY_PACKAGE_REPLACED)) {
-            if (GcmHelper.sLoggingEnabled) {
+            if (EasyGcm.sLoggingEnabled) {
                 GcmUtils.Logger.d("Received application update broadcast");
             }
 

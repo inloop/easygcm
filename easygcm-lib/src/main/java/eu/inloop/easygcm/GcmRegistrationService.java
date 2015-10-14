@@ -49,20 +49,21 @@ public class GcmRegistrationService extends IntentService {
             // Not really needed, only handles one type of intent
             case ACTION_REGISTER_GCM:
                 if (isAlreadyRegistered(getApplicationContext())) {
-                    if (GcmHelper.sLoggingEnabled) {
+                    if (EasyGcm.sLoggingEnabled) {
                         GcmUtils.Logger.w("The application was registered already before this registration could start.");
                     }
                     releaseWakeLock();
                     return;
                 }
                 registerGcm();
+                releaseWakeLock();
                 break;
         }
     }
 
     private void registerGcm() {
         String regId = null;
-        String gcmHelperId = GcmHelper.getGcmSenderId(getApplicationContext());
+        String gcmHelperId = EasyGcm.getGcmSenderId(getApplicationContext());
 
         long currentBackoff = DEFAULT_BACKOFF_MS;
 
@@ -73,7 +74,7 @@ public class GcmRegistrationService extends IntentService {
                         GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
                 break;
             } catch (IOException ex) {
-                if (GcmHelper.sLoggingEnabled) {
+                if (EasyGcm.sLoggingEnabled) {
                     GcmUtils.Logger.w("Failed to register. Error :" + ex.getMessage());
                 }
                 // If there is an error, don't just keep trying to register.
@@ -89,7 +90,7 @@ public class GcmRegistrationService extends IntentService {
                     currentBackoff *= 2;
                 }
             } catch (SecurityException ex) {
-                if (GcmHelper.sLoggingEnabled) {
+                if (EasyGcm.sLoggingEnabled) {
                     GcmUtils.Logger.w("Failed to register. Error :" + ex.getMessage());
                 }
                 // On some devices like (GT-P5210, NokiaX2DS , GT-I9082L, W100, ILIUM
@@ -100,26 +101,24 @@ public class GcmRegistrationService extends IntentService {
                 // We think, it is probably due to missing Google Play Services, but we do not have
                 // proper feedback on this.
                 // Since there is no known solution at the moment for this, we will just catch it.
+            }
         }
 
         if (regId != null) {
-            if (GcmHelper.sLoggingEnabled) {
+            if (EasyGcm.sLoggingEnabled) {
                 GcmUtils.Logger.d("New registration ID=[" + regId + "]");
             }
-            GcmHelper.getInstance().onSuccessfulRegistration(getApplicationContext(), regId);
+            EasyGcm.getInstance().onSuccessfulRegistration(getApplicationContext(), regId);
 
         } else {
-            if (GcmHelper.sLoggingEnabled) {
+            if (EasyGcm.sLoggingEnabled) {
                 GcmUtils.Logger.w("Definitely failed to register after " + MAX_RETRIES + " retries");
             }
         }
-
-        // if the service was started with a wakelock, release it
-        releaseWakeLock();
     }
 
     private boolean isAlreadyRegistered(Context context) {
-        return GcmHelper.isRegistered(context);
+        return EasyGcm.isRegistered(context);
     }
 
     private void releaseWakeLock() {
