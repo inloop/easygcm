@@ -14,12 +14,9 @@ android {
     }
 }
 
-repositories {
-    mavenCentral()
-}
-
 dependencies {
-    compile 'com.google.android.gms:play-services-base:6.5.87'
+    compile 'com.google.android.gms:play-services-base:8.1.0'
+    compile 'com.google.android.gms:play-services-gcm:8.1.0'
 }
 
 // upload to remote Maven repo
@@ -29,6 +26,7 @@ dependencies {
 uploadArchives {
     repositories {
         mavenDeployer {
+            pom.artifactId = POM_ARTIFACT_ID
             repository(url: "file://${System.env.HOME}/.m2/repository")
         }
     }

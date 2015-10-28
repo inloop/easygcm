@@ -8,8 +8,9 @@ import android.os.Build;
 import android.text.TextUtils;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.google.android.gms.iid.InstanceID;
 
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -23,10 +24,10 @@ public final class GcmHelper {
     private static final String PREFS_EASYGCM = "easygcm";
     private static final String PROPERTY_REG_ID = "registration_id";
     private static final String PROPERTY_APP_VERSION = "appVersion";
-    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
     private static GcmHelper sInstance;
     private GcmListener mGcmListener;
+    private GcmServicesHandler mCheckServicesHandler;
     static volatile boolean sLoggingEnabled = true;
     private final AtomicBoolean mRegistrationRunning = new AtomicBoolean(false);
     private static final int DEFAULT_BACKOFF_MS = 2000;
@@ -45,7 +46,7 @@ public final class GcmHelper {
     }
 
     private GcmHelper() {
-
+        mCheckServicesHandler = new GcmServicesHandler();
     }
 
     @SuppressWarnings("UnusedDeclaration")
@@ -56,7 +57,7 @@ public final class GcmHelper {
     /**
      * Allows to specify custom {@link eu.inloop.easygcm.GcmListener} if you don't want to implement it in the {@link
      * android.app.Application} instance.
-     *
+     * <p/>
      * This method should be called in {@link android.app.Application#onCreate()}.
      *
      * @param gcmListener custom GCM listener
@@ -65,40 +66,45 @@ public final class GcmHelper {
         getInstance().mGcmListener = gcmListener;
     }
 
-    private void onCreate(Activity activity) {
+    /**
+     * Allows to specify a custom {@link eu.inloop.easygcm.GcmServicesHandler} which handles a situation
+     * when Google Play services are not available. Typically this should display a warning dialog.
+     * The default handler shows
+     * {@link com.google.android.gms.common.GoogleApiAvailability#getErrorDialog(android.app.Activity, int, int)}
+     *
+     * @param handler your custom handler for checking GcmServices.
+     */
+    public static void setCheckServicesHandler(GcmServicesHandler handler) {
+        if (handler == null) {
+            throw new IllegalArgumentException("GcmServicesHandler can't be null");
+        }
+        getInstance().mCheckServicesHandler = handler;
+    }
+
+    private void onCreate(Activity context) {
         // Check device for Play Services APK. If check succeeds, proceed with GCM registration.
-        if (checkPlayServices(activity)) {
-            final String currentRegId = getRegistrationId(activity);
+        if (checkPlayServices(context)) {
+            final String currentRegId = getRegistrationId(context);
 
             if (currentRegId.isEmpty()) {
-                registerInBackground(activity, null);
+                registerInBackground(context, null);
             } else {
                 if (sLoggingEnabled) {
                     Logger.d("Checking existing registration ID=[" + currentRegId + "]");
                 }
             }
         } else {
-            Logger.d("No valid Google Play Services APK found.");
+            if (sLoggingEnabled) {
+                Logger.d("No valid Google Play Services found.");
+            }
         }
     }
 
-    /**
-     * Check the device to make sure it has the Google Play Services APK. If
-     * it doesn't, display a dialog that allows users to download the APK from
-     * the Google Play Store or enable it in the device's system settings.
-     */
     private boolean checkPlayServices(Activity activity) {
-        final int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(activity);
+        final int resultCode = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(activity);
         if (resultCode != ConnectionResult.SUCCESS) {
-            if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
-                GooglePlayServicesUtil.getErrorDialog(resultCode, activity,
-                        PLAY_SERVICES_RESOLUTION_REQUEST).show();
-            } else {
-                if (sLoggingEnabled) {
-                    Logger.d("This device is not supported.");
-                }
-                activity.finish();
-            }
+            mCheckServicesHandler.onPlayServicesUnavailable(activity, resultCode,
+                    GoogleApiAvailability.getInstance().isUserResolvableError(resultCode));
             return false;
         }
         return true;
@@ -109,7 +115,7 @@ public final class GcmHelper {
      * {@code SharedPreferences}.
      *
      * @param context application's context.
-     * @param regId registration ID
+     * @param regId   registration ID
      */
     private void storeRegistrationId(Context context, String regId) {
         final int appVersion = GcmUtils.getAppVersion(context);
@@ -124,11 +130,11 @@ public final class GcmHelper {
 
     /**
      * Gets the current registration ID for application on GCM service, if there is one.
-     * <p>
+     * <p/>
      * If result is empty, the app needs to register.
      *
      * @return registration ID, or empty string if there is no existing
-     *         registration ID.
+     * registration ID.
      */
     public static String getRegistrationId(Context context) {
         final SharedPreferences prefs = getGcmPreferences(context);
@@ -154,8 +160,32 @@ public final class GcmHelper {
     }
 
     /**
+     * Get GCM sender id from available configuration.
+     * <p/>
+     * Returns gcm_defaultSenderId if it's provided by the google services gradle plugin via
+     * google-services.json. Otherwise, returns easygcm_sender_id value for easygcm backward
+     * compatibility.
+     *
+     * @param context Application context
+     * @return GCM sender id
+     */
+    private static String getGcmSenderId(Context context) {
+        final Context appContext = context.getApplicationContext();
+
+        // Try to use gcm_defaultSenderId generated by google services gradle task
+        String gcmSenderId = appContext.getResources().getString(R.string.gcm_defaultSenderId);
+        if (!TextUtils.isEmpty(gcmSenderId)) {
+            return gcmSenderId;
+        }
+
+        // Try to use easygcm_sender_id value for backward compatibility
+        gcmSenderId = appContext.getResources().getString(R.string.easygcm_sender_id);
+        return gcmSenderId;
+    }
+
+    /**
      * Registers the application with GCM servers asynchronously.
-     * <p>
+     * <p/>
      * Stores the registration ID and the app versionCode in the application's
      * shared preferences.
      */
@@ -172,23 +202,27 @@ public final class GcmHelper {
             return;
         }
 
-        final String gcmSenderId = appContext.getResources().getString(R.string.easygcm_sender_id);
+        final String gcmSenderId = getGcmSenderId(context);
         if (TextUtils.isEmpty(gcmSenderId)) {
-            throw new IllegalArgumentException("You have to override the easygcm_sender_id string resource to provide the GCM sender ID");
+            throw new IllegalArgumentException("You have to override the easygcm_sender_id string "
+                    + "resource to provide the GCM sender ID, OR provide it using google services "
+                    + "gradle plugin and google-services.json configuration.");
         }
 
         final AsyncTask<Void, Void, Void> registrationTask = new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
-                final GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(appContext);
                 String regId = null;
+
                 long currentBackoff = DEFAULT_BACKOFF_MS;
 
                 for (int i = 0; i < MAX_RETRIES; i++) {
                     try {
-                        regId = gcm.register(gcmSenderId);
+                        InstanceID instanceID = InstanceID.getInstance(context);
+                        regId = instanceID.getToken(gcmSenderId,
+                                GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
                         break;
-                    }  catch (IOException ex) {
+                    } catch (IOException ex) {
                         if (sLoggingEnabled) {
                             Logger.w("Failed to register. Error :" + ex.getMessage());
                         }
@@ -260,10 +294,10 @@ public final class GcmHelper {
             return mGcmListener;
         }
         if (context.getApplicationContext() instanceof GcmListener) {
-            return (GcmListener)context.getApplicationContext();
+            return (GcmListener) context.getApplicationContext();
         }
         throw new IllegalStateException("Please implement GcmListener in your Application or use method " +
-            "setGcmListener()");
+                "setGcmListener()");
     }
 
 }

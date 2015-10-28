@@ -1,0 +1,15 @@
+allprojects {
+    repositories {
+        mavenLocal()
+        jcenter()
+    }
+}
+
+repositories {
+    mavenCentral()
+    jcenter();
+}
+
+rootProject.dependencies {
+    compile project(':easygcm-tasks')
+}
