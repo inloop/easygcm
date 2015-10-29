@@ -238,6 +238,18 @@ public final class GcmHelper {
                             }
                             currentBackoff *= 2;
                         }
+                    } catch (SecurityException ex) {
+                        if (sLoggingEnabled) {
+                            Logger.w("Failed to register. Error :" + ex.getMessage());
+                        }
+                        // On some devices like (GT-P5210, NokiaX2DS , GT-I9082L, W100, ILIUM
+                        // S220) and/with custom ROM's library crashes with following error:
+                        // java.lang.SecurityException: Not allowed to start service Intent
+                        // { act=com.google.android.c2dm.intent.REGISTER pkg=com.google.android.gms (has extras) }
+                        // without permission com.google.android.c2dm.permission.RECEIVE ...
+                        // We think, it is probably due to missing Google Play Services, but we do not have
+                        // proper feedback on this.
+                        // Since there is no known solution at the moment for this, we will just catch it.
                     }
                 }
 
