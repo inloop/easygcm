@@ -1,3 +1,9 @@
+## 1.5.4 (2015-10-29)
+
+Bugfixes:
+
+  - [#61 Catch for SecurityException in some exotic cases during GCM registration] (https://github.com/inloop/easygcm/issues/61)
+
 ## 1.5.3 (2015-10-13)
 
 Bugfixes:
