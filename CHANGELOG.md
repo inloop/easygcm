@@ -1,3 +1,9 @@
+## 1.5.5 (2015-11-26)
+
+Features:
+
+  - [#63 Updated to Google Play Services 8.3.0] (https://github.com/inloop/easygcm/issues/63)
+
 ## 1.5.4 (2015-10-29)
 
 Bugfixes:

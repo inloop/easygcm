@@ -40,9 +40,9 @@ repositories {
 
 dependencies {
     compile project(':easygcm-lib')
-    //compile 'eu.inloop:easygcm:1.5.0@aar'
-    compile 'com.google.android.gms:play-services-base:8.1.0'
-    compile 'com.google.android.gms:play-services-gcm:8.1.0'
+    //compile 'eu.inloop:easygcm:1.5.5@aar'
+    compile 'com.google.android.gms:play-services-base:8.3.0'
+    compile 'com.google.android.gms:play-services-gcm:8.3.0'
 }
 
 task push(type: eu.inloop.easygcm.PushTask) {
