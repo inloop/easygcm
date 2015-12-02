@@ -1,3 +1,17 @@
+## 1.6.0 (2015-12-02)
+
+Features:
+
+  - [#39 Gcm registration now handled by WakefulIntentService] (https://github.com/inloop/easygcm/issues/39)
+  - [#59 Added a method to remove gcm registration ID.] (https://github.com/inloop/easygcm/issues/59)
+  - GcmHelper class is now deprecated in favour of EasyGcm class.
+  - The logging is now handled by EasyGcm.Logger class and can have its logging levels set.
+
+Bugfixes:
+
+  - [#23 Gcm registration will not start until the device connects online] (https://github.com/inloop/easygcm/issues/23)
+  - [#29 Registration is invalidated and restarted on OS upgrade] (https://github.com/inloop/easygcm/issues/29)
+
 ## 1.5.5 (2015-11-26)
 
 Features:
