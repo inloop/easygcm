@@ -3,7 +3,7 @@ package eu.inloop.easygcm.sample;
 import android.app.Activity;
 import android.os.Bundle;
 
-import eu.inloop.easygcm.GcmHelper;
+import eu.inloop.easygcm.EasyGcm;
 
 
 public class MainActivity extends Activity {
@@ -12,7 +12,8 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        GcmHelper.init(this);
+        EasyGcm.setLoggingLevel(EasyGcm.Logger.LEVEL_WARNING);
+        EasyGcm.init(this);
     }
 
 }

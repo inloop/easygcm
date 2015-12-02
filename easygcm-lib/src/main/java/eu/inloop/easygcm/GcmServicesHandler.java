@@ -15,8 +15,6 @@ public class GcmServicesHandler {
      */
     protected void onPlayServicesUnavailable(Activity context, int errorCode, boolean recoverable) {
         GoogleApiAvailability.getInstance().getErrorDialog(context, errorCode, PLAY_SERVICES_RESOLUTION_REQUEST).show();
-        if (GcmHelper.sLoggingEnabled) {
-            GcmUtils.Logger.d("This device is not supported. Error code " + errorCode + " Recoverable - " + recoverable);
-        }
+        EasyGcm.Logger.d("This device is not supported. Error code " + errorCode + " Recoverable - " + recoverable);
     }
 }

@@ -21,12 +21,9 @@ public class EasyGcmListenerService extends GcmListenerService {
     // [START receive_message]
     @Override
     public void onMessageReceived(String from, Bundle data) {
+        EasyGcm.Logger.d("Received message from: " + from);
 
-        if (GcmHelper.sLoggingEnabled) {
-            GcmUtils.Logger.d("Received message from: " + from);
-        }
-
-        GcmHelper.getInstance().getGcmListener(getApplication()).onMessage(from, data);
+        EasyGcm.getInstance().getGcmListener(getApplication()).onMessage(from, data);
 
     }
     // [END receive_message]
