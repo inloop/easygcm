@@ -17,7 +17,7 @@ public class ConnectionUtils {
             NetworkInfo netInfo = cm.getActiveNetworkInfo();
             return (netInfo != null && netInfo.isConnected());
         }
-        // No permission to access network state was given, return true and hope for the best
+        // Hope for the best if no permission was given to check network status
         return true;
     }
 

@@ -47,8 +47,8 @@ public final class GcmHelper {
     }
 
     @SuppressWarnings("UnusedDeclaration")
-    public void setLoggingEnabled(boolean isEnabled) {
-        EasyGcm.getInstance().setLoggingEnabled(isEnabled);
+    public void setLoggingEnabled(int logLevel) {
+        EasyGcm.setLoggingLevel(logLevel);
     }
 
     public GcmListener getGcmListener(Context context) {

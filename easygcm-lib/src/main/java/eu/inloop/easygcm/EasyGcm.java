@@ -4,10 +4,14 @@ package eu.inloop.easygcm;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.text.TextUtils;
+import android.util.Log;
 
 import easygcm.R;
 
 public class EasyGcm {
+
+    static final String TAG = "easygcm";
+
     private static final String PREFS_EASYGCM = "easygcm";
     private static final String PROPERTY_REG_ID = "registration_id";
     private static final String PROPERTY_APP_VERSION = "appVersion";
@@ -15,9 +19,15 @@ public class EasyGcm {
     private static EasyGcm sInstance;
     private GcmListener mGcmListener;
     private GcmServicesHandler mCheckServicesHandler;
-    static volatile boolean sLoggingEnabled = true;
 
     @SuppressWarnings("UnusedDeclaration")
+    /**
+     * Registers an application specified by its Context to the GCM. The method should be called when
+     * an application wants the access to the GCM, typically at startup. The registration is guaranteed
+     * to only run once.
+     *
+     * @param context an object containing the context of the application to be registered
+     */
     public static void init(Context context) {
         getInstance().onCreate(context);
     }
@@ -78,9 +88,8 @@ public class EasyGcm {
      */
     private static void storeRegistrationId(Context context, String regId) {
         final int appVersion = GcmUtils.getAppVersion(context);
-        if (sLoggingEnabled) {
-            GcmUtils.Logger.d("Saving regId on app version " + appVersion);
-        }
+        Logger.d("Saving regId on app version " + appVersion);
+
         final SharedPreferences.Editor editor = getGcmPreferences(context).edit();
         editor.putString(PROPERTY_REG_ID, regId);
         editor.putInt(PROPERTY_APP_VERSION, appVersion);
@@ -100,9 +109,7 @@ public class EasyGcm {
         final SharedPreferences prefs = getGcmPreferences(context);
         final String registrationId = prefs.getString(PROPERTY_REG_ID, "");
         if (registrationId.isEmpty()) {
-            if (sLoggingEnabled) {
-                GcmUtils.Logger.d("Registration not found.");
-            }
+            Logger.d("Registration not found.");
             return "";
         }
         // Check if app was updated; if so, it must clear the registration ID
@@ -111,9 +118,7 @@ public class EasyGcm {
         final int registeredVersion = prefs.getInt(PROPERTY_APP_VERSION, Integer.MIN_VALUE);
         final int currentVersion = GcmUtils.getAppVersion(context);
         if (registeredVersion != currentVersion) {
-            if (sLoggingEnabled) {
-                GcmUtils.Logger.d("App version changed.");
-            }
+            Logger.d("App version changed.");
             return "";
         }
         return registrationId;
@@ -132,6 +137,16 @@ public class EasyGcm {
     }
 
     /**
+     * Sets the logging level of the library. The possible values are constants from
+     * @link eu.inloop.easygcm.EasyGcm.Logger - LEVEL_NONE, LEVEL_ERROR, LEVEL_WARNING and LEVEL_DEBUG
+     * @param loggingLevel the logging level at which the library should log output
+     */
+    @SuppressWarnings("UnusedDeclaration")
+    public static void setLoggingLevel(int loggingLevel) {
+        Logger.setLogLevel(loggingLevel);
+    }
+
+    /**
      * @return Application's {@code SharedPreferences}.
      */
     private static SharedPreferences getGcmPreferences(Context context) {
@@ -139,18 +154,14 @@ public class EasyGcm {
         return context.getSharedPreferences(PREFS_EASYGCM, Context.MODE_PRIVATE);
     }
 
-    @SuppressWarnings("UnusedDeclaration")
-    public void setLoggingEnabled(boolean isEnabled) {
-        sLoggingEnabled = isEnabled;
-    }
-
     /**
      * Registers the application defined by a context activity to GCM in case the registration
-     * has not been done already.
+     * has not been done already. The method can be called anytime, but typically at app startup. The
+     * registration itself is guaranteed to only run once.
      * @param context Activity belonging to the app being registered
      */
     private void onCreate(Context context) {
-        // The check method fails if: device is offline / app already registered / GooglePlayServices unavailable
+        // The check method fails if: no network connection / app already registered / GooglePlayServices unavailable
         if (GcmUtils.checkCanAndShouldRegister(context)) {
             // Start a background service to register in a background thread
             context.startService(GcmRegistrationService.createGcmRegistrationIntent(context));
@@ -209,5 +220,37 @@ public class EasyGcm {
         }
         throw new IllegalStateException("Please implement GcmListener in your Application or use method " +
                 "setGcmListener()");
+    }
+
+    public static class Logger {
+
+        public static final int LEVEL_DEBUG = 3;
+        public static final int LEVEL_WARNING = 2;
+        public static final int LEVEL_ERROR = 1;
+        public static final int LEVEL_NONE = 0;
+
+        static int sLogLevel = Logger.LEVEL_DEBUG;
+
+        static void setLogLevel(int logLevel) {
+            sLogLevel = logLevel;
+        }
+
+        static void d(String message) {
+            if (sLogLevel >= LEVEL_DEBUG) {
+                Log.d(TAG, message);
+            }
+        }
+
+        static void w(String message) {
+            if (sLogLevel >= LEVEL_WARNING) {
+                Log.w(TAG, message);
+            }
+        }
+
+        static void e(String message) {
+            if (sLogLevel >= LEVEL_ERROR) {
+                Log.e(TAG, message);
+            }
+        }
     }
 }

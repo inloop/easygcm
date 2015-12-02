@@ -49,9 +49,7 @@ public class GcmRegistrationService extends IntentService {
             // Not really needed, only handles one type of intent
             case ACTION_REGISTER_GCM:
                 if (isAlreadyRegistered(getApplicationContext())) {
-                    if (EasyGcm.sLoggingEnabled) {
-                        GcmUtils.Logger.w("The application was registered already before this registration could start.");
-                    }
+                    EasyGcm.Logger.w("The application was registered already before this registration could start.");
                     releaseWakeLock();
                     return;
                 }
@@ -74,12 +72,7 @@ public class GcmRegistrationService extends IntentService {
                         GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
                 break;
             } catch (IOException ex) {
-                if (EasyGcm.sLoggingEnabled) {
-                    GcmUtils.Logger.w("Failed to register. Error :" + ex.getMessage());
-                }
-                // If there is an error, don't just keep trying to register.
-                // Require the user to click a button again, or perform
-                // exponential back-off.
+                EasyGcm.Logger.w("Failed to register. Error :" + ex.getMessage());
 
                 if (i < MAX_RETRIES - 1) {
                     try {
@@ -90,9 +83,8 @@ public class GcmRegistrationService extends IntentService {
                     currentBackoff *= 2;
                 }
             } catch (SecurityException ex) {
-                if (EasyGcm.sLoggingEnabled) {
-                    GcmUtils.Logger.w("Failed to register. Error :" + ex.getMessage());
-                }
+
+                EasyGcm.Logger.w("Failed to register. Error :" + ex.getMessage());
                 // On some devices like (GT-P5210, NokiaX2DS , GT-I9082L, W100, ILIUM
                 // S220) and/with custom ROM's library crashes with following error:
                 // java.lang.SecurityException: Not allowed to start service Intent
@@ -105,15 +97,11 @@ public class GcmRegistrationService extends IntentService {
         }
 
         if (regId != null) {
-            if (EasyGcm.sLoggingEnabled) {
-                GcmUtils.Logger.d("New registration ID=[" + regId + "]");
-            }
+            EasyGcm.Logger.d("New registration ID=[" + regId + "]");
             EasyGcm.getInstance().onSuccessfulRegistration(getApplicationContext(), regId);
 
         } else {
-            if (EasyGcm.sLoggingEnabled) {
-                GcmUtils.Logger.w("Definitely failed to register after " + MAX_RETRIES + " retries");
-            }
+            EasyGcm.Logger.w("Definitely failed to register after " + MAX_RETRIES + " retries");
         }
     }
 
