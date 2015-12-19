@@ -15,7 +15,7 @@ It includes all the common code from the sample including AndroidManifest.xml th
 
 > Note: Both methods are executed asynchronously in background thread and the wake lock is held until the method is executed. Don't start other asynchronous tasks here unless needed - the wake lock would be released and the tasks would not be guaranteed to run. Put the blocking code right into these methods.
 
-* In your `MainActivity` `onCreate()`, call `GcmHelper.init(this);`
+* In your `MainActivity` `onCreate()`, call `EasyGcm.setGcmListener(this);`
 * Define GCM Sender ID adding `google-service.json` configuration and setting up Google Services Gradle plugin as described in [Implementing GCM Client on Android ](https://developers.google.com/cloud-messaging/android/client)
 
 If you need ```GET_ACCOUNTS``` permission, add this to you application's manifest:
