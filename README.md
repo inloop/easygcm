@@ -8,15 +8,22 @@ It includes all the common code from the sample including AndroidManifest.xml th
 
 ### How to use:
 
-* Add this to your build.gradle: `compile 'eu.inloop:easygcm:1.6.0@aar'`
+* The project uses Google Play Services, so make sure you have:
+ * `classpath 'com.google.gms:google-services:1.5.0` in your project root gradle file
+ * `apply plugin: 'com.google.gms.google-services'` in your module gradle file
+ * `compile 'com.google.android.gms:play-services-gcm:8.3.0'` in your module gradle file dependencies
+
+* Add this to your build.gradle: `compile 'eu.inloop:easygcm:1.6.1@aar'`
 * In your `Application` implement [GcmListener](http://github.com/inloop/easygcm/blob/master/easygcm/src/main/java/eu/inloop/easygcm/GcmListener.java) interface with two methods:
   * `onMessage()`
   * `sendRegistrationIdToBackend()`
 
 > Note: Both methods are executed asynchronously in background thread and the wake lock is held until the method is executed. Don't start other asynchronous tasks here unless needed - the wake lock would be released and the tasks would not be guaranteed to run. Put the blocking code right into these methods.
 
-* In your `MainActivity` `onCreate()`, call `GcmHelper.init(this);`
+* In your `MainActivity` `onCreate()`, call `EasyGcm.init(this);`
 * Define GCM Sender ID adding `google-service.json` configuration and setting up Google Services Gradle plugin as described in [Implementing GCM Client on Android ](https://developers.google.com/cloud-messaging/android/client)
+
+* Alternatively, instead of being implemented by the `Application` class, you can have your own instance of [GcmListener](http://github.com/inloop/easygcm/blob/master/easygcm/src/main/java/eu/inloop/easygcm/GcmListener.java) and set it in the application with `EasyGcm.setGcmListener(GcmListener listener)`
 
 If you need ```GET_ACCOUNTS``` permission, add this to you application's manifest:
 

@@ -1,3 +1,10 @@
+## 1.6.1 (2015-12-21)
+
+Features:
+
+  - Updated com.android.tools.build:gradle to 1.5.0
+  - Updated com.google.gms:google-services to 1.5.0
+
 ## 1.6.0 (2015-12-02)
 
 Features:
