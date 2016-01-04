@@ -34,7 +34,16 @@ If you need ```GET_ACCOUNTS``` permission, add this to you application's manifes
 That's it. You might also want to use Gradle task for sending push notifications to your device:
 
 * add Gradle dependency to buildscript section: `classpath 'eu.inloop:easygcm-tasks:1.3.0'`
-* edit push notification data, apiKey and registration ID in build.gradle
+* add following code to your build.gradle and edit push notification data, apiKey and registration ID
+```groovy
+task push(type: eu.inloop.easygcm.PushTask) {
+    data = '{"myMessage":"Hello World"}'
+    apiKey = 'AIzaSyDt0uzm74Un5qsoEyQcvE-5lhDB3n3m9XX' // Server API Key
+    registrationIds = [
+            'mt4gNCjtlRs:APA91bHiu_7X_CzA_IbSk9FiR_wk9b6sIvAuR6t-zoE5ujSx0D5Obql5dZiQ9DrEK8YsJm4lBr2nNLKWGRKSr2GZJSgdm_jxOWO4nBCE2QYNzJTS2bCTPRgrIH7cra0t1BEU7g2dwnYY'
+    ]
+}
+```
 * call `./gradlew push`
 
 ### How to build locally:
