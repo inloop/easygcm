@@ -9,7 +9,7 @@ It includes all the common code from the sample including AndroidManifest.xml th
 ### How to use:
 
 * The project uses Google Play Services, so make sure you have:
- * `classpath 'com.google.gms:google-services:1.5.0` in your project root gradle file
+ * `classpath 'com.google.gms:google-services:1.5.0'` in your project root gradle file
  * `apply plugin: 'com.google.gms.google-services'` in your module gradle file
  * `compile 'com.google.android.gms:play-services-gcm:8.3.0'` in your module gradle file dependencies
 
