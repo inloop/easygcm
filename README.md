@@ -13,7 +13,7 @@ It includes all the common code from the sample including AndroidManifest.xml th
  * `apply plugin: 'com.google.gms.google-services'` in your module gradle file
  * `compile 'com.google.android.gms:play-services-gcm:8.3.0'` in your module gradle file dependencies
 
-* Add this to your build.gradle: `compile 'eu.inloop:easygcm:1.6.1@aar'`
+* Add this to your build.gradle: `compile 'eu.inloop:easygcm:1.6.2@aar'`
 * In your `Application` implement [GcmListener](https://github.com/inloop/easygcm/blob/master/easygcm-lib/src/main/java/eu/inloop/easygcm/GcmListener.java) interface with two methods:
   * `onMessage()`
   * `sendRegistrationIdToBackend()`
@@ -30,6 +30,8 @@ If you need ```GET_ACCOUNTS``` permission, add this to you application's manifes
     <uses-permission
         android:name="android.permission.GET_ACCOUNTS"
         tools:remove="android:maxSdkVersion"/>
+
+If you want to access the `registrationId` after the registration has finished, you can use `EasyGcm.isRegistered(Context context)`, `EasyGcm.getRegistrationId(Context context)` or for convenience `EasyGcm.resendRegistrationIdToBackend(Context context)` (returns `null` if registrationId does not exist).
 
 That's it. You might also want to use Gradle task for sending push notifications to your device:
 

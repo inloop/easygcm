@@ -137,6 +137,17 @@ public class EasyGcm {
     }
 
     /**
+     * Repeats the procedure invoked after a successful registration - calls sendRegistrationIdToBackend()
+     * again. Returns null if registration has not yet occured or was unsuccessful
+     * @param context application's context.
+     */
+    public static void resendRegistrationIdToBackend(Context context) {
+        getInstance()
+                .getGcmListener(context)
+                .sendRegistrationIdToBackend(getRegistrationId(context));
+    }
+
+    /**
      * Sets the logging level of the library. The possible values are constants from
      * @link eu.inloop.easygcm.EasyGcm.Logger - LEVEL_NONE, LEVEL_ERROR, LEVEL_WARNING and LEVEL_DEBUG
      * @param loggingLevel the logging level at which the library should log output

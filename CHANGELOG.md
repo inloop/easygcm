@@ -1,3 +1,9 @@
+## 1.6.2 (2016-02-16)
+
+Features:
+
+  - Added esendRegistrationIdToBackend(Context context) convenience method (https://github.com/inloop/easygcm/issues/69)
+
 ## 1.6.1 (2015-12-21)
 
 Features:
