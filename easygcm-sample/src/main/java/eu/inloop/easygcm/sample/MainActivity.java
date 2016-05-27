@@ -13,7 +13,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         EasyGcm.setLoggingLevel(EasyGcm.Logger.LEVEL_WARNING);
-        EasyGcm.init(this);
+        EasyGcm.init(getApplicationContext());
     }
 
 }
