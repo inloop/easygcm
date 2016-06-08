@@ -1,1 +1,35 @@
-{"project_info":{"project_id":"default-demo-app-4f283","project_number":"793737100265","name":"Default Demo App"},"client":[{"client_info":{"client_id":"android:gcm.play.android.samples.com.gcmquickstart","client_type":1,"android_client_info":{"package_name":"gcm.play.android.samples.com.gcmquickstart"}},"oauth_client":[],"services":{"analytics_service":{"status":1},"cloud_messaging_service":{"status":2,"apns_config":[]},"appinvite_service":{"status":1,"other_platform_oauth_client":[]},"google_signin_service":{"status":1},"ads_service":{"status":1}}}]}
+{
+  "project_info": {
+    "project_number": "323021324497",
+    "project_id": "easygcm-sample-app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:323021324497:android:e1df31b5e7b0164e",
+        "android_client_info": {
+          "package_name": "eu.inloop.easygcm.sample"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC1Pyb6z5TLlT-nJb9x-VLE4bXyKcw5WUU"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

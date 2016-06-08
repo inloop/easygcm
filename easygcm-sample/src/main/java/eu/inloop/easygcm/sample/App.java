@@ -15,7 +15,7 @@ public class App extends Application implements GcmListener {
         Log.v(TAG, "### message from: " + from);
         Log.v(TAG, "### data: " + from);
         for (String key : data.keySet()) {
-            Log.v(TAG, "> " + key + ": " + data.get(key));
+            Log.v(TAG, "### > " + key + ": " + data.get(key));
         }
     }
 

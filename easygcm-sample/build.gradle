@@ -33,10 +33,10 @@ dependencies {
 
 task push(type: eu.inloop.easygcm.PushTask) {
     data = '{"myMessage":"Hello World"}'
-    apiKey = 'AIzaSyB7ech9F12igTfHmm9X5GtsA66UBAdt-XE' // easygcm-client project
+    apiKey = 'AIzaSyAsw9okdSwztkWNo9XaMaorFaBBwHgkmQw' // easygcm-client project
     registrationIds = [
             // replace with your app's id before running the gradlew push task
-            'cHL7f5zj7Qk:APA91bFi9ThwBZZYmMa-vFtbXk-pXT6ZjzUeYW0x2jidmaxii2oXQ7LjsACi-205FqV0h4TnNlRTZXlafp_McPD7DSKbSBMV4a5qgBapNowxVnL0OuajOd19qBYbvxy3mdSa0SmF8Ne7'
+            'cQ6-fkzDWMk:APA91bE3OVnIjVtDwWITLovTWRjWRF09HapRhqqNgQQ4ae6_JrjU78FbCYsIJCgZ8EqFlyiUfWzOMeDUOx_gxaCa35DjDcW1tpKvCa5m-kEFs78BAqNTEhPRxD7yS7PfEdIcgTNYuy_t'
     ]
 }
 
