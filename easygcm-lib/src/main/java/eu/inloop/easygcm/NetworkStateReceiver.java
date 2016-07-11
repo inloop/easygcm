@@ -12,7 +12,7 @@ public class NetworkStateReceiver extends WakefulBroadcastReceiver {
     public void onReceive(Context context, final Intent intent) {
         EasyGcm.Logger.d("Connection state changed event received...");
 
-        if (GcmUtils.checkCanAndShouldRegister(context)) {
+        if (EasyGcm.isInitialized() && GcmUtils.checkCanAndShouldRegister(context)) {
             Intent serviceIntent = GcmRegistrationService.createGcmRegistrationIntent(context, true);
             startWakefulService(context, serviceIntent);
         }
