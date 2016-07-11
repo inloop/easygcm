@@ -17,6 +17,8 @@ public class EasyGcm {
     private static final String PROPERTY_APP_VERSION = "appVersion";
 
     private static EasyGcm sInstance;
+    private static EasyState mEasyState;
+
     private GcmListener mGcmListener;
     private GcmServicesHandler mCheckServicesHandler;
 
@@ -29,7 +31,7 @@ public class EasyGcm {
      * @param context an object containing the context of the application to be registered
      */
     public static void init(Context context) {
-        getInstance().onCreate(context);
+        getInstance().onCreate(context, EasyState.INIT_WAS_CALLED);
     }
 
     synchronized static EasyGcm getInstance() {
@@ -77,6 +79,10 @@ public class EasyGcm {
      */
     public static boolean isRegistered(Context context) {
         return !TextUtils.isEmpty(getRegistrationId(context));
+    }
+
+    public static boolean isInitialized() {
+        return mEasyState == EasyState.INIT_WAS_CALLED;
     }
 
     /**
@@ -177,6 +183,18 @@ public class EasyGcm {
             // Start a background service to register in a background thread
             context.startService(GcmRegistrationService.createGcmRegistrationIntent(context));
         }
+    }
+
+    /**
+     * Registers the application defined by a context activity to GCM in case the registration
+     * has not been done already. The method can be called anytime, but typically at app startup. The
+     * registration itself is guaranteed to only run once. Added with state of initializing of easyGCM
+     * @param context Activity belonging to the app being registered
+     * @param easyState State of initializing easyGCM
+     */
+    private void onCreate(Context context, EasyState easyState) {
+        mEasyState = easyState;
+        onCreate(context);
     }
 
     /**
